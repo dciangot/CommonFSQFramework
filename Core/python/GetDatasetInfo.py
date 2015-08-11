@@ -201,10 +201,11 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
                         fileListUnvalidated.add(localROOTPrefix+fname)
             elif isXrootdAccess:
-                if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
+              if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
                 # Warning: duplicated from copyAnaData. Fixme
-                import subprocess
-                pathSE = sampleList[s]["pathSE"]
+              import subprocess
+              pathSE2 = sampleList[s]["pathSE"]
+              for pathSE in pathSE2:
                 cnt = 999
                 offset = 0
                 lastSize = len(fileListUnvalidated)
