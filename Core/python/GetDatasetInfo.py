@@ -193,7 +193,9 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             if localAccess:
                 if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
                 if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
-                for dirpath, dirnames, filenames in os.walk(sampleList[s]["pathTrees"]):
+                pathTrees2 = sampleList[s]["pathTrees"]
+                for pathTrees in pathTrees2:
+                  for dirpath, dirnames, filenames in os.walk(pathTrees):
                     for f in filenames:
 
                         if not f.startswith("trees_"): continue
