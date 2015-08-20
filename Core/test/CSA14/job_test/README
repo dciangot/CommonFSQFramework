@@ -4,3 +4,5 @@ FW.sh : this script start the submission of jobs to lxplus batch queue system, c
 hadd.sh: once all the jobs are finished this script merge all the histograms in an output file called result.root
 
 CSA14_UEAna_comp.C: this is the root macro to be modified and that is used from the FW.sh
+
+Please notice that is setup for MC analysis. I will update the data one soon.
