@@ -6,7 +6,8 @@
 #include "CondFormats/CastorObjects/interface/CastorChannelQuality.h"
 #include "CondFormats/CastorObjects/interface/CastorChannelStatus.h"
 #include "CondFormats/DataRecord/interface/CastorChannelQualityRcd.h"
-#include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
+//#include "DataFormats/METReco/interface/HcalCaloFlagLabels.h"
+// -Removed with references due to compile error
 
 CastorRecHitView::CastorRecHitView(const edm::ParameterSet& iConfig, TTree * tree):
 EventViewBase(iConfig,  tree)
@@ -63,8 +64,8 @@ void CastorRecHitView::fillSpecific(const edm::Event& iEvent, const edm::EventSe
             addToIVec("isBad", (int)RechitIsBad);
         }
         if (m_saturationInfo) {
-            addToIVec("isSaturated", static_cast<int>(rh.flagField(HcalCaloFlagLabels::ADCSaturationBit)));
-            addToIVec("isDesaturated", static_cast<int>(rh.flagField(HcalCaloFlagLabels::UserDefinedBit0)));
+            //addToIVec("isSaturated", static_cast<int>(rh.flagField(HcalCaloFlagLabels::ADCSaturationBit)));
+            //addToIVec("isDesaturated", static_cast<int>(rh.flagField(HcalCaloFlagLabels::UserDefinedBit0)));
         }
     }
 }

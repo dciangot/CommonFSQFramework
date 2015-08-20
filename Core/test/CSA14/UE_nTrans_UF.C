@@ -156,12 +156,23 @@
 
 TH1 *data;
 TH1 *data2; 
+<<<<<<< HEAD
+TFile *f00 = new TFile("MC_7-21-15_eta20.root");
+TFile *f01 = new TFile("DATA_7-23-15_eta20.root");
+=======
 TFile *f00 = new TFile("plotsCSA14_UEAna_3.root");
 TFile *f01 = new TFile("plots_UETrackJet_lowPU.root");
+>>>>>>> CFFmain/master
 //f00->Cd("MinBias_TuneMonash13_13TeV_pythia8");
 
 //nTrans_SisCon5->Draw();
 
+<<<<<<< HEAD
+    TProfile *d=(TProfile*) f01->Get("Run2015B/transNch_b2");
+
+ 	
+    TH2F *sum = (TH2F*) d->Clone();
+=======
     TH2F *da=(TH2F*) f01->Get("Run2015B_4/ptTrans_SisCone5");
     TH2F *da_1=(TH2F*) f01->Get("Run2015B_5/ptTrans_SisCone5");
      TH2F *da_2=(TH2F*) f01->Get("Run2015B_6/ptTrans_SisCone5");
@@ -182,6 +193,7 @@ sum->Add(da_5);
 sum->Add(da_6);
 sum->Add(da_7);
 sum->Add(da_8);
+>>>>>>> CFFmain/master
 
 cout << sum->GetEntries() << endl;
 //MinBias_TuneCUETHS1_13TeV-herwigpp
@@ -190,6 +202,17 @@ cout << sum->GetEntries() << endl;
 
 //TFile *f01 = new TFile("plotsCSA14_UEAna_4M.root");
 //TFile *f01 = new TFile("/afs/cern.ch/work/d/dciangot/CMSSW_7_0_5/src/MNTriggerStudies/MNTriggerAna/test/CSA14/plotsCSA14_UEAna_old.root");
+<<<<<<< HEAD
+    TProfile *g=(TProfile*) f00->Get("MinBias_TuneCUETP8M1_13TeV-pythia8/transNch_b2");
+//TH2F* da2=(TH2F*) f01->Get("MinBias_TuneMonash13_13TeV_pythia8/gen_nTrans_SisCone5");
+    TProfile *g2=(TProfile*) f00->Get("MinBias_TuneCUETHS1_13TeV-herwigpp/transNch_b2");
+
+    //TProfile data = da->ProfileY("d");
+
+     //data=(TH1*)  sum->ProfileY()->ProjectionX();
+     //data2=(TH1*)  da2->ProfileY()->ProjectionX();
+     //data3=(TH1*)  da3->ProfileY()->ProjectionX();
+=======
     TH2F *da2=(TH2F*) f00->Get("MinBias_TuneCUETP8M1_13TeV-pythia8/nTrans_SisCone5");
 //TH2F* da2=(TH2F*) f01->Get("MinBias_TuneMonash13_13TeV_pythia8/gen_nTrans_SisCone5");
     TH2F *da3=(TH2F*) f00->Get("MinBias_TuneCUETHS1_13TeV-herwigpp/nTrans_SisCone5");
@@ -199,14 +222,21 @@ cout << sum->GetEntries() << endl;
      data=(TH1*)  sum->ProfileY()->ProjectionX();
      data2=(TH1*)  da2->ProfileY()->ProjectionX();
      data3=(TH1*)  da3->ProfileY()->ProjectionX();
+>>>>>>> CFFmain/master
 
     //data2= gen_nTrans_SisCon5->ProfileY()->DrawCopy();
 
    //data->Draw(); 
    
+<<<<<<< HEAD
+   //TH1F *d= (TH1F*) data->Clone(); 
+   //TH1F *g= (TH1F*) data2->Clone();	
+   //TH1F *g2= (TH1F*) data3->Clone();
+=======
    TH1F *d= (TH1F*) data->Clone(); 
    TH1F *g= (TH1F*) data2->Clone();	
    TH1F *g2= (TH1F*) data3->Clone();
+>>>>>>> CFFmain/master
 
    d->Sumw2();
    g->Sumw2();
@@ -331,5 +361,8 @@ TPad *c1_2 = new TPad("c1_2", "newpad",0.01,0.01,0.99,0.32);
     c1->SaveAs("UE_ptTrans.png");
 //    gSystem->Exit(0);
 }
+<<<<<<< HEAD
+=======
     
 
+>>>>>>> CFFmain/master

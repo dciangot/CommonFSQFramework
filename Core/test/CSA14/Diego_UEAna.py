@@ -13,8 +13,11 @@ from array import *
 
 p1="_post"
 
-class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
+class Diego_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
+
+        self.jetMode = False #DR
+
 	self.hist = {}
         self.hist_vertex = {}
 	self.hist_pre = {}
@@ -229,7 +232,7 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
             self.other_SisCon5[h].Sumw2()
             self.GetOutputList().Add(self.other_SisCon5[h])
          
-
+        #self.eventCounter = 0
 
     def analyze(self):
         # note: use printTTree.py asamplename in order to learn what tries/branches are avaliable
@@ -293,13 +296,16 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
 	vtx_z=0
 
 
-        if self.fChain.lumi >= 90:  
+        if self.fChain.lumi >= 90 and self.fChain.trgZeroBias == 1:  
+         #self.eventCounter += 1
+         #if self.eventCounter == 100: sys.exit("You have set the program to exit at 10000 events!")
+
          for i in xrange(0, self.fChain.vtxisFake.size()):
                     
                     vtxrho = math.sqrt(self.fChain.vtxx.at(i)*self.fChain.vtxx.at(i) + self.fChain.vtxy.at(i)*self.fChain.vtxy.at(i))
 
 		    nu=nu+1	
-                    if not self.fChain.vtxisFake.at(i) and abs(self.fChain.vtxz.at(i)) <= 10 and self.fChain.vtxndof.at(i) > 4 and vtxrho <= 2: # count only good primary vertices
+                    if not self.fChain.vtxisFake.at(i) and abs(self.fChain.vtxz.at(i) - self.fChain.vtxzBS.at(i)) <= 10 and self.fChain.vtxndof.at(i) > 4 and vtxrho <= 2: # count only good primary vertices
                         numgoodvtx+=1
 			if numgoodvtx==1:
 			 vtx_x=self.fChain.vtxx.at(i)
@@ -308,6 +314,8 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
 			self.hist_vertex["ndfVtx"].Fill(self.fChain.vtxndof.at(i))	
         self.hist_vertex["nVtx"].Fill(numgoodvtx) 
 
+        #print "Event", self.eventCounter
+        #print "good vertex?", numgoodvtx
         sumpt=0.
         pt=-1.
         dphi=999
@@ -333,50 +341,167 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
 	phif=0
 	etaf=0
 
+        #DR DR DR: Can add a check to initialize these only if not self.jetMode
+        l_trd0Err=[]
+	l_trdzErr=[]
+        l_trptErr=[]
+
+	l_trx=[]
+	l_try=[]		
+	l_trz=[]
+
+	l_trd0= []
+	l_trdz=  []
+
+        l_trHighPurity = []
+
+        l_trGood = []
+
+
 	self.hist_vertex["nJets"].Fill(self.fChain.SisCone5CHp4.size())
 
-		
-	for i in xrange(0, self.fChain.SisCone5CHp4.size()): # SisCone5
-                    trackp4 = self.fChain.SisCone5CHp4.at(i)
-                    if trackp4.pt()>ptf:
-                        ptf=trackp4.pt()
-                        phif=trackp4.phi()
-                        etaf=trackp4.eta()
+        #DR
+        #JET MODE
+        if self.jetMode:
+            leadObjSize = self.fChain.SisCone5CHp4.size()
+            leadObjp4 = self.fChain.SisCone5CHp4
+            nJetTracks = self.fChain.SisCone5CHnConst
+            ptMin = 1
+        #TRACK MODE
+        else:
+            leadObjSize = self.fChain.recoTracksp4.size()
+            leadObjp4 = self.fChain.recoTracksp4
+            nJetTracks = self.fChain.recoTracksnValidHits #This is a bit of an awkward placeholder for an observable tracks don't need.
+            ptMin = 0.5
+
+	#LEADING OBJECT LOOP
+	for i in xrange(0, leadObjSize): #DR
+
+                    #JET MODE
+                    if self.jetMode:
+                        trackp4 = leadObjp4.at(i) #DR
+                        if trackp4.pt()>ptf:
+                            ptf=trackp4.pt()
+                            phif=trackp4.phi()
+                            etaf=trackp4.eta()
+
+                    #TRACK MODE
+                    if not self.jetMode:
+		        track = self.fChain.recoTracksp4.at(i)
+                        l_trd0Err.append( self.fChain.recoTracksd0Err.at(i) )
+	                l_trdzErr.append( self.fChain.recoTracksdzErr.at(i) )	
+                        l_trptErr.append( self.fChain.recoTracksptErr.at(i) )
+
+	                l_trx.append( self.fChain.recoTracksvx.at(i) )
+	                l_try.append( self.fChain.recoTracksvy.at(i) )	
+	                l_trz.append( self.fChain.recoTracksvz.at(i) )
+
+		        tr_x=self.fChain.recoTracksvx.at(i)
+		        tr_y=self.fChain.recoTracksvy.at(i)		
+		        tr_z=self.fChain.recoTracksvz.at(i) 
+
+	                l_trd0.append( (- (tr_x-vtx_x) * track.py() + (tr_y-vtx_y) * track.px() ) / track.pt()  )
+
+	                l_trdz.append(  (tr_z-vtx_z) - ((tr_x-vtx_x)*track.px()+(tr_y-vtx_y)*track.py())/track.pt() * (track.pz()/track.pt())	 )
+
+                        l_trHighPurity.append( self.fChain.recoTrackshighPurity.at(i) )
+
+                        l_trGood.append( 0 )
+
+		        if math.fabs(l_trd0[i]/l_trd0Err[i])<3:
+		            if math.fabs(l_trdz[i]/l_trdzErr[i])<3:
+		                if l_trptErr[i]/track.pt()<0.05:
+		                    if track.pt()>0.5 and math.fabs(track.eta())<2.:	#DR: I have to be careful with this!
+                                        l_trGood[i] = 1
+
+                        if l_trGood[i]:
+                            if track.pt()>ptf:
+                                ptf=track.pt()
+                                phif=track.phi()
+                                etaf=track.eta()
+
+        #print "ptMax", ptf
+                        
+                        
+
+        #END LEADING OBJECT LOOP
+           
 	self.hist_full_jet["f_ptSisCone5"].Fill(ptf)
         self.hist_full_jet["f_phiSisCone5"].Fill(phif)
         self.hist_full_jet["f_etaSisCone5"].Fill(etaf)
-        if numgoodvtx == 1:
-	    for i in xrange(0, self.fChain.SisCone5CHp4.size()): # SisCone5
-                    trackp4 = self.fChain.SisCone5CHp4.at(i)	
-                    if self.fChain.SisCone5CHnConst.at(i)>1:
-                     if trackp4.pt()>pt:
-                        pt=trackp4.pt()
-                        phi=trackp4.phi()
-			eta=trackp4.eta()
-			ntracks=self.fChain.SisCone5CHnConst.at(i)
+        if numgoodvtx >= 1:
+            iptf = -1
+            ptf = 0
+            ###
+	    for i in xrange(0, leadObjp4.size()): #DR # SisCone5
+                    trackp4 = leadObjp4.at(i) #DR
+
+                    proceed = False  #DR
+
+                    if self.jetMode and self.fChain.SisCone5CHnConst.at(i) > 1: proceed = True  #DR
+                    if not self.jetMode and l_trGood[i]: proceed = True  #DR
+
+                    #print "proceed?", proceed
+                    if proceed:  #DR
+                     if trackp4.pt()>ptf: #DR BIG BUG WAS HERE!!!
+                        ptf=trackp4.pt()
+                        phif=trackp4.phi()
+			etaf=trackp4.eta()
+			ntracks=nJetTracks.at(i) #DR
+                        iptf = i
 			#d0
 			#d0err	
-            if not pt < 1 and math.fabs(eta)<2.:
+
+            ###
+            #print "SPOT 0"
+            #print "pt, ptMin, math.fabs(eta)", ptf, ptMin, math.fabs(eta)
+            #print "ptMax", ptf
+            #print "sigs", math.fabs(l_trd0[iptf]/l_trd0Err[iptf]), math.fabs(l_trdz[iptf]/l_trdzErr[iptf]), l_trptErr[iptf]/ptf, l_trHighPurity[iptf], l_trGood[iptf]
+            if not ptf < ptMin and math.fabs(etaf)<2.:
                 self.hist_jet["ptSisCone5"].Fill(pt)
 		self.hist_jet["phiSisCone5"].Fill(phi)
 		self.hist_jet["etaSisCone5"].Fill(eta)
 		self.hist_jet["nTracksSisCone5"].Fill(ntracks)
+
 	    #if True:	
-		print self.fChain.recoTracksd0Err.size()
+		#print self.fChain.recoTracksd0Err.size()
+                #print "SPOT 1"
+
+                ###
                 for i in xrange(0, self.fChain.recoTracksd0Err.size()):
 		  track= self.fChain.recoTracksp4.at(i)
-		  #tr_d0=self.fChain.recoTracksd0.at(i)
-		  tr_d0Err=self.fChain.recoTracksd0Err.at(i)
-		  tr_dzErr=self.fChain.recoTracksdzErr.at(i) 	
-		  tr_ptErr=self.fChain.recoTracksptErr.at(i)	
 
-		  tr_x=self.fChain.recoTracksvx.at(i)
-		  tr_y=self.fChain.recoTracksvy.at(i)		
-		  tr_z=self.fChain.recoTracksvz.at(i) 
+                  #JET MODE
+                  if self.jetMode:
+		      #tr_d0=self.fChain.recoTracksd0.at(i)
+		      tr_d0Err=self.fChain.recoTracksd0Err.at(i)
+		      tr_dzErr=self.fChain.recoTracksdzErr.at(i) 	
+		      tr_ptErr=self.fChain.recoTracksptErr.at(i)	
 
-		  tr_d0= (- (tr_x-vtx_x) * track.py() + (tr_y-vtx_y) * track.px() ) / track.pt() 
+		      tr_x=self.fChain.recoTracksvx.at(i)
+		      tr_y=self.fChain.recoTracksvy.at(i)		
+		      tr_z=self.fChain.recoTracksvz.at(i) 
 
-	          tr_dz=  (tr_z-vtx_z) - ((tr_x-vtx_x)*track.px()+(tr_y-vtx_y)*track.py())/track.pt() * (track.pz()/track.pt())		 
+		      tr_d0= (- (tr_x-vtx_x) * track.py() + (tr_y-vtx_y) * track.px() ) / track.pt() 
+
+	              tr_dz=  (tr_z-vtx_z) - ((tr_x-vtx_x)*track.px()+(tr_y-vtx_y)*track.py())/track.pt() * (track.pz()/track.pt())	
+
+                  #TRACK MODE
+                  if not self.jetMode:
+		      #tr_d0=self.fChain.recoTracksd0.at(i)
+		      tr_d0Err=l_trd0Err[i]
+		      tr_dzErr=l_trdzErr[i]	
+		      tr_ptErr=l_trptErr[i]	
+
+		      tr_x=l_trx[i]
+		      tr_y=l_try[i]		
+		      tr_z=l_trz[i]
+
+		      tr_d0=l_trd0[i]
+
+	              tr_dz=l_trdz[i]
+
+
 
 		  purity=0
         	  imp0= 0
@@ -387,7 +512,9 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
                   while dphi > math.pi:
                          dphi=dphi-2*math.pi
                   while dphi < -math.pi:
-                         dphi=dphi+2*math.pi	
+                         dphi=dphi+2*math.pi
+
+                  #print "FILL 1"	
 		  self.hist_pre["trackD0"].Fill(tr_d0)
 		  self.hist_pre["trackD0Err"].Fill(tr_d0Err)
 		  self.hist_pre["trackD0Significance"].Fill(tr_d0/tr_d0Err)	
@@ -410,7 +537,8 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
 		       #dpt=1	
 		       if track.pt()>0.5 and math.fabs(track.eta())<2.:	
 		  	kin=1
-			if not pt < 1 and math.fabs(eta)<2.:# and ntracks > 1:	 		
+			if not ptf < ptMin and math.fabs(etaf)<2.:# and ntracks > 1:
+                           #print "FILL 2"	 		
 			   self.hist_post["trackD0"+p1].Fill(tr_d0)
                  	   self.hist_post["trackD0Err"+p1].Fill(tr_d0Err)
                  	   self.hist_post["trackD0Significance"+p1].Fill(tr_d0/tr_d0Err)
@@ -451,17 +579,20 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         	  self.hist_pre["impz"].Fill(impz)
                   self.hist_pre["dpt"].Fill(dpt)
                   self.hist_pre["kin"].Fill(kin)
+                #print "individual n", n, n_tow, n_away
+                #print "total n", n+n_tow+n_away
 		if n+n_tow+n_away>-1:
-  	    	 self.hist_jet["nTot_SisCone5"].Fill(n+n_tow+n_away,pt)
-                 self.Trans_SisCon5["nTot"].Fill(pt,n+n_tow+n_away)
+                 #print "FILL 3"
+  	    	 self.hist_jet["nTot_SisCone5"].Fill(n+n_tow+n_away,ptf)
+                 self.Trans_SisCon5["nTot"].Fill(ptf,n+n_tow+n_away)
 
-                 self.Trans_SisCon5["ptTot"].Fill(pt,sumpt+sumpt_away+sumpt_tow)
+                 self.Trans_SisCon5["ptTot"].Fill(ptf,sumpt+sumpt_away+sumpt_tow)
 	         #if n+n_tow+n_away>0:
-                 self.hist_trans["nTrans_SisCone5"].Fill(n,pt)
-		 self.Trans_SisCon5["nTransDensity"].Fill(pt,n)
+                 self.hist_trans["nTrans_SisCone5"].Fill(n,ptf)
+		 self.Trans_SisCon5["nTransDensity"].Fill(ptf,n)
 
-                 self.Trans_SisCon5["ptTransDensity"].Fill(pt,sumpt)
-                 self.hist_trans["ptTrans_SisCone5"].Fill(sumpt,pt)	
+                 self.Trans_SisCon5["ptTransDensity"].Fill(ptf,sumpt)
+                 self.hist_trans["ptTrans_SisCone5"].Fill(sumpt,ptf)	
 		 if sumpt1>sumpt2:
 			sumpt_max=sumpt1
 			sumpt_min=sumpt2
@@ -475,35 +606,35 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
                         n_max=n2
                         n_min=n1
   
-		 self.hist_trans["nTransMax_SisCone5"].Fill(n_max,pt)
-                 self.other_SisCon5["nTransMax"].Fill(pt,n_max)
+		 self.hist_trans["nTransMax_SisCone5"].Fill(n_max,ptf)
+                 self.other_SisCon5["nTransMax"].Fill(ptf,n_max)
 		  	
-                 self.hist_trans["ptTransMax_SisCone5"].Fill(sumpt_max,pt)
-	         self.other_SisCon5["ptTransMax"].Fill(pt,sumpt_max)  
+                 self.hist_trans["ptTransMax_SisCone5"].Fill(sumpt_max,ptf)
+	         self.other_SisCon5["ptTransMax"].Fill(ptf,sumpt_max)  
 
-                 self.hist_trans["nTransMin_SisCone5"].Fill(n_min,pt)
-		 self.other_SisCon5["nTransMin"].Fill(pt,n_min)  
+                 self.hist_trans["nTransMin_SisCone5"].Fill(n_min,ptf)
+		 self.other_SisCon5["nTransMin"].Fill(ptf,n_min)  
 			
-                 self.hist_trans["ptTransMin_SisCone5"].Fill(sumpt_min,pt)	
-		 self.other_SisCon5["ptTransMin"].Fill(pt,sumpt_min)
+                 self.hist_trans["ptTransMin_SisCone5"].Fill(sumpt_min,ptf)	
+		 self.other_SisCon5["ptTransMin"].Fill(ptf,sumpt_min)
 
-		 self.hist_trans["nTransDiff_SisCone5"].Fill(-n_min+n_max,pt)
-		 self.other_SisCon5["nDiff"].Fill(pt,-n_min+n_max)
+		 self.hist_trans["nTransDiff_SisCone5"].Fill(-n_min+n_max,ptf)
+		 self.other_SisCon5["nDiff"].Fill(ptf,-n_min+n_max)
 
-                 self.hist_trans["ptTransDiff_SisCone5"].Fill(-sumpt_min+sumpt_max,pt)
-		 self.other_SisCon5["ptDiff"].Fill(pt,-sumpt_min+sumpt_max)	
+                 self.hist_trans["ptTransDiff_SisCone5"].Fill(-sumpt_min+sumpt_max,ptf)
+		 self.other_SisCon5["ptDiff"].Fill(ptf,-sumpt_min+sumpt_max)	
 
-		 self.hist_tow["nTow_SisCone5"].Fill(n_tow,pt)
-		 self.Trans_SisCon5["nTow"].Fill(pt,n_tow)
+		 self.hist_tow["nTow_SisCone5"].Fill(n_tow,ptf)
+		 self.Trans_SisCon5["nTow"].Fill(ptf,n_tow)
 			
-                 self.hist_tow["ptTow_SisCone5"].Fill(sumpt_tow,pt)
-		 self.Trans_SisCon5["ptTow"].Fill(pt,sumpt_tow)	
+                 self.hist_tow["ptTow_SisCone5"].Fill(sumpt_tow,ptf)
+		 self.Trans_SisCon5["ptTow"].Fill(ptf,sumpt_tow)	
 
-		 self.hist_away["nAway_SisCone5"].Fill(n_away,pt)
-		 self.Trans_SisCon5["nAway"].Fill(pt,n_away)
+		 self.hist_away["nAway_SisCone5"].Fill(n_away,ptf)
+		 self.Trans_SisCon5["nAway"].Fill(ptf,n_away)
 
-                 self.hist_away["ptAway_SisCone5"].Fill(sumpt_away,pt)
-		 self.Trans_SisCon5["ptAway"].Fill(pt,sumpt_away)	
+                 self.hist_away["ptAway_SisCone5"].Fill(sumpt_away,ptf)
+		 self.Trans_SisCon5["ptAway"].Fill(ptf,sumpt_away)	
 
         return 1
 
@@ -512,6 +643,9 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
         normFactor = self.getNormalizationFactor()
         print "  applying norm", normFactor
 
+
+        #DR DR DR DR commented out to test as my analysis does not scale
+        """
 	for h in self.Trans_SisCon5:
            self.Trans_SisCon5[h].Scale(3/(2*4*math.pi))
 	for h in self.other_SisCon5:
@@ -519,7 +653,7 @@ class CSA14_UEAna(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader)
 
         for h in self.hist:
             self.hist[h].Scale(normFactor)
-
+        """
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
     ROOT.gSystem.Load("libFWCoreFWLite.so")
@@ -535,16 +669,12 @@ if __name__ == "__main__":
     # Run printTTree.py alone to get the samples list
     #sampleList = []
     #sampleList.append("QCD_Pt-15to3000_TuneZ2star_Flat_HFshowerLibrary_7TeV_pythia6")
-
-
-    maxFilesMC = 30
-
-    maxFilesData = 30
-
-
-
-    nWorkers =12 
-
+    #maxFilesMC = 1
+    #maxFilesData = 1
+    #nWorkers = 1
+    maxNevents = -1
+    #maxFilesData = 1
+    #nWorkers =12 
     # '''
 
 
@@ -553,12 +683,11 @@ if __name__ == "__main__":
 
 
     # use printTTree.py <sampleName> to see what trees are avaliable inside the skim file
-    CSA14_UEAna.runAll(treeName="UETree",
+    Diego_UEAna.runAll(treeName="UETree",
                                slaveParameters=slaveParams,
                                sampleList=sampleList,
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
+                               maxNevents = maxNevents,
                                nWorkers=nWorkers,
-
-				outFile = "plots_UETrackJet_lowPU.root" )
-
+				outFile = "plots_Diego_8-13-15_vtxs.root" )

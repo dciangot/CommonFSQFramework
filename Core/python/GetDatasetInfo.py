@@ -303,4 +303,3 @@ if __name__ == "__main__":
     #    print s
     #getTreeFilesAndNormalizations(maxFilesMC = 10, maxFilesData = 10)
 
-

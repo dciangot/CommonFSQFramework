@@ -80,11 +80,12 @@ class ExampleProofReader( ROOT.TPySelector ):
         variablesToFetch = ROOT.gSystem.Getenv(self.encodeEnvString("VariablesToFetch") )
         #print variablesToFetch
         split = variablesToFetch.split(",")
+	print " "
         for s in split:
             attrRaw = ROOT.gSystem.Getenv(self.encodeEnvString(s))
             #print s, attr
             attrSpl = attrRaw.split(";;;")
-            print s, attrSpl
+            print "Variable ", s, " set to: ", attrSpl[0]
             attr = attrSpl[0]
             attrType = attrSpl[1]
 
@@ -105,7 +106,7 @@ class ExampleProofReader( ROOT.TPySelector ):
                 print "Dont know what to do with", s, attrType
 
         #print "XXX1", self.YODA, self.LUKE, self.VADER, self.LEIA, self.LEIA2
-
+        print " "
 
 
     def Begin( self ):
@@ -314,7 +315,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
     @classmethod
     def runAll(cls, treeName, outFile, sampleList = None, \
-               maxFilesMC=None, maxFilesData=None, \
+               maxFilesMC=None, maxFilesData=None, maxNevents = -1, \
                slaveParameters = None, nWorkers=None,
                usePickle=False, useProofOFile = False,
                verbosity=1):
@@ -334,7 +335,6 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         slaveParameters["useProofOFile"] = useProofOFile
 
-
         if not useProofOFile:
             of = ROOT.TFile(outFile,"RECREATE")
             if not of:
@@ -344,7 +344,7 @@ class ExampleProofReader( ROOT.TPySelector ):
 
         slaveParameters["outFile"] = outFile
 
-
+        if maxNevents == None: maxNevents = -1 # extra security, run on all events
 
         skipped = []
 
@@ -369,8 +369,6 @@ class ExampleProofReader( ROOT.TPySelector ):
             slaveParameters["normalizationFactor"] =  treeFilesAndNormalizations[t]["normFactor"]
 
             ROOT.TProof.AddEnvVar("PATH2",ROOT.gSystem.Getenv("PYTHONPATH")+":"+os.getcwd())
-
-            #ROOT.gSystem.Setenv("TMFDatasetName", t)
 
             supportedTypes = set(["int", "str", "float", "bool"])
             variablesToFetch = ""
@@ -408,11 +406,12 @@ class ExampleProofReader( ROOT.TPySelector ):
 
 
             proof.Exec( 'gSystem->Setenv("PYTHONPATH",gSystem->Getenv("PATH2"));') # for some reason cannot use method below for python path
-            proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
+            #proof.Exec( 'gSystem->Setenv("PATH", "'+ROOT.gSystem.Getenv("PATH") + '");')
             for v in variablesToSetInProof:
                 # if you get better implemenation (GetParameter?) mail me
                 proof.Exec('gSystem->Setenv("'+v+'","'+variablesToSetInProof[v]+'");')
-            print dataset.Process( 'TPySelector',  cls.__name__)
+	    	
+            print dataset.Process( 'TPySelector',  cls.__name__, maxNevents) # with parameter to limit on number of events
 
             try:
                 print "Logs saved to:"
@@ -431,8 +430,9 @@ class ExampleProofReader( ROOT.TPySelector ):
                                 else:
                                     print l,
                         elif verbosity == 1:
-                            if any("error" in l.lower() for l in f) or any("exception" in l.lower() for l in f) or any("warning" in l.lower() for l in f):
+                            if any([("error" in l.lower()) or ("exception" in l.lower()) or ("warning" in l.lower()) for l in f]):
                                 print "Error/Warning found in log file. Printing first log of worker node:"
+                                f.seek(0)
                                 for l in f:
                                     if "error" in l.lower() or "exception" in l.lower():
                                         print bcolors.ERROR + l.rstrip('\n') + bcolors.ENDC
@@ -474,6 +474,8 @@ class ExampleProofReader( ROOT.TPySelector ):
                 #command = 'gSystem->Unsetenv("'+v+'");'
                 #print command
                 proof.Exec('gSystem->Unsetenv("'+v+'");')
+
+	    proof.Close()
 
         if len(skipped)>0:
             print "Note: following samples were skipped:"

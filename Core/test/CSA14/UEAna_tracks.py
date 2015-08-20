@@ -15,7 +15,440 @@ p1="_post"
 
 class UEAna_tracks(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader):
     def init( self):
-        self.etacut = 2.
+        self.etacut = 0.8
+
+
+	self.hist = {}
+
+        self.hist_vertex = {}
+
+	self.hist_pre = {}
+
+	self.hist_post = {}
+
+	self.hist_gen = {}
+
+        self.hist_jet = {}
+
+	self.hist_gent = {}
+
+	self.hist_trans = {}
+
+	self.hist_tow = {}
+
+	self.hist_away = {}
+
+	self.hist_gentow = {}
+
+        self.hist_genaway = {}
+
+	self.hist_full_jet = {}
+
+	self.hist_full_tracks = {}
+
+	self.hist_full_genjet = {}
+
+        self.hist_full_gentracks = {}
+
+        self.Trans_SisCon5 = {}
+
+        self.other_SisCon5 = {}
+
+     
+
+	self.hist_full_genjet["fgen_ptSisCone5"] =  ROOT.TH1F("fgen_pt_SisCone5",   "ptTrackJets",  200, 0, 200)
+
+        self.hist_full_genjet["fgen_etaSisCone5"] =  ROOT.TH1F("fgen_eta_SisCone5",   "etaTrackJets",  100 , -5, 5)
+
+        self.hist_full_genjet["fgen_phiSisCone5"] =  ROOT.TH1F("fgen_phi_SisCone5",   "phiTrackJets",  628 , -3.14, 3.14)
+
+
+
+        self.hist_full_gentracks["fgen_trackPt"] =  ROOT.TH1F("fgen_tracksPt",   "tracksPt",  5000, 0, 500)
+
+
+
+        self.hist_full_jet["f_ptSisCone5"] =  ROOT.TH1F("f_pt_SisCone5",   "ptTrackJets",  200, 0, 200)
+
+        self.hist_full_jet["f_etaSisCone5"] =  ROOT.TH1F("f_eta_SisCone5",   "etaTrackJets",  100 , -5, 5)
+
+        self.hist_full_jet["f_phiSisCone5"] =  ROOT.TH1F("f_phi_SisCone5",   "phiTrackJets",  628 , -3.14, 3.14
+
+)
+
+
+
+        self.hist_full_tracks["f_trackPt"] =  ROOT.TH1F("f_trackPt",   "tracksPt",  5000, 0, 500)
+
+
+
+
+
+        #p = "_central_B" # a placeholder for different triggers ("B") and uncertainty variations
+
+                         #  "central" means this is a central value (ie no variations were applied)
+
+        self.hist_vertex["nVtx"] =  ROOT.TH1F("nVtx",   "nVtx",  100, 0, 100)
+
+        self.hist_vertex["ndfVtx"] =  ROOT.TH1F("ndfVtx",   "ndfVtx",  100, 0, 100)
+
+	self.hist_vertex["gen_nJets"] = ROOT.TH1F("gen_nJets",   "nJets",  100, 0, 100)
+
+	self.hist_vertex["nJets"] = ROOT.TH1F("nJets",   "nJets",  100, 0, 100)
+
+#######        
+
+	self.hist_pre["trackD0"] =  ROOT.TH1F("tracksD0",   "tracksD0",  2000, -10, 10)
+
+ 	self.hist_pre["trackD0Err"] =  ROOT.TH1F("tracksD0Err",   "tracksD0Err",  1000, 0, 10)
+
+        self.hist_pre["trackD0Significance"] =  ROOT.TH1F("tracksD0Significance",   "tracksD0Sig",  2000, -100, 100)
+
+	self.hist_pre["trackDz"] =  ROOT.TH1F("tracksDz",   "tracksDz",  20000, -100 , 100)
+
+        self.hist_pre["trackDzErr"] =  ROOT.TH1F("tracksDzErr",   "tracksDzErr",  1000, 0, 10)
+
+        self.hist_pre["trackDzSignificance"] =  ROOT.TH1F("tracksDzSignificance",   "tracksDzSig",  2000, -100, 100)
+
+
+
+        self.hist_pre["trackPt"] =  ROOT.TH1F("tracksPt",   "tracksPt",  5000, 0, 500) 
+
+	self.hist_pre["trackPtErr"] =  ROOT.TH1F("tracksPtErr",   "tracksPtErr",  5000, 0, 50)	
+
+        self.hist_pre["trackPtSigma"] =  ROOT.TH1F("tracksPtSigma",   "tracksPtSigma",  5000, 0, 50)
+
+
+
+	self.hist_pre["trackEta"] =  ROOT.TH1F("tracksEta",   "tracksEta",  100, -5, 5)
+
+	self.hist_pre["trackPhi"] =  ROOT.TH1F("tracksPhi",   "tracksPhi",  628, -3.14, 3.14)
+
+        self.hist_pre["trackDeltaPhi"] =  ROOT.TH1F("tracksDeltaPhi",   "tracksDeltaPhi",  62800, -3.14, 3.14)
+
+
+
+	self.hist_pre["purity"] =  ROOT.TH1F("purity",   "purity",  2, 0., 2)
+
+	self.hist_pre["imp0"] =  ROOT.TH1F("imp0",   "imp0",  2, 0., 2)
+
+	self.hist_pre["impz"] =  ROOT.TH1F("impz",   "impz",  2, 0., 2)
+
+	self.hist_pre["dpt"] =  ROOT.TH1F("dpt",   "dpt",  2, 0., 2)
+
+	self.hist_pre["kin"] =  ROOT.TH1F("kin",   "kin",  2, 0., 2)
+
+######
+
+        self.hist_post["trackD0"+p1] =  ROOT.TH1F("tracksD0"+p1,   "tracksD0",  2000, -10, 10)
+
+        self.hist_post["trackD0Err"+p1] =  ROOT.TH1F("tracksD0Err"+p1,   "tracksD0Err",  1000, 0, 10)
+
+        self.hist_post["trackD0Significance"+p1] =  ROOT.TH1F("tracksD0Significance"+p1,   "tracksD0Sig",  2000, -100, 100)
+
+        self.hist_post["trackDz"+p1] =  ROOT.TH1F("tracksDz"+p1,   "tracksD0",  20000, -100 , 100)
+
+        self.hist_post["trackDzErr"+p1] =  ROOT.TH1F("tracksDzErr"+p1,   "tracksDzErr",  1000, 0, 10)
+
+        self.hist_post["trackDzSignificance"+p1] =  ROOT.TH1F("tracksDzSignificance"+p1,   "tracksDzSig",  2000, -100, 100)
+
+
+
+        self.hist_post["trackPt"+p1] =  ROOT.TH1F("tracksPt"+p1,   "tracksPt",  5000, 0, 500) 
+
+        self.hist_post["trackPtErr"+p1] =  ROOT.TH1F("tracksPtErr"+p1,   "tracksPtErr",  5000, 0, 50)      
+
+        self.hist_post["trackPtSigma"+p1] =  ROOT.TH1F("tracksPtSigma"+p1,   "tracksPtSigma",  5000, 0, 50)
+
+
+
+        self.hist_post["trackEta"+p1] =  ROOT.TH1F("tracksEta"+p1,   "tracksEta",  100, -5, 5)
+
+        self.hist_post["trackPhi"+p1] =  ROOT.TH1F("tracksPhi"+p1,   "tracksPhi",  628, -3.14, 3.14)
+
+        self.hist_post["trackDeltaPhi"+p1] =  ROOT.TH1F("tracksDeltaPhi"+p1,   "tracksDeltaPhi",  62800, -3.14, 3.14)
+
+
+
+	self.hist_gen["gen_trackDeltaPhi"] =  ROOT.TH1F("gen_tracksDeltaPhi",   "tracksDeltaPhi",  62800, -3.14, 3.14)
+
+        self.hist_gen["gen_trackPt"] =  ROOT.TH1F("gen_tracksPt",   "tracksPt",  5000, 0, 500)
+
+	self.hist_gen["gen_trackEta"] =  ROOT.TH1F("gen_tracksEta",   "tracksEta",  100, -5, 5)
+
+        self.hist_gen["gen_trackPhi"] =  ROOT.TH1F("gen_tracksPhi",   "tracksPhi",  628, -3.14, 3.14)
+
+
+
+######
+
+	self.hist["gen_ptSisCone5"] =  ROOT.TH1F("gen_pt_SisCone5",   "ptTrackJets",  200, 0, 200)
+
+        self.hist["gen_etaSisCone5"] =  ROOT.TH1F("gen_eta_SisCone5",   "etaTrackJets",  100 , -5, 5)
+
+        self.hist["gen_phiSisCone5"] =  ROOT.TH1F("gen_phi_SisCone5",   "phiTrackJets",  628 , -3.14, 3.14)
+
+
+
+        self.hist_jet["ptSisCone5"] =  ROOT.TH1F("pt_SisCone5",   "ptTrackJets",  200, 0, 200)
+
+	self.hist_jet["etaSisCone5"] =  ROOT.TH1F("eta_SisCone5",   "etaTrackJets",  100 , -5, 5)
+
+	self.hist_jet["phiSisCone5"] =  ROOT.TH1F("phi_SisCone5",   "phiTrackJets",  628 , -3.14, 3.14)
+
+	self.hist_jet["nTracksSisCone5"] =  ROOT.TH1F("nTracks_SisCone5",   "nTracks_TracksJets",  100 , 0, 100)
+
+
+
+	self.hist["gen_nJetTracks"] =  ROOT.TH1F("gen_nJetTracks",   "nTracks_TracksJets",  100 , 0, 100)
+
+
+
+#	self.hist["ptSisCone7"] =  ROOT.TH1F("pt_SisCone7",   "ptTrackJets",  20, 0, 20)
+
+
+
+#        self.hist["ptak5"] =  ROOT.TH1F("pt_ak5",   "ptTrackJets",  20, 0, 20)
+
+#        self.hist["ptak7"] =  ROOT.TH1F("pt_ak7",   "ptTrackJets",  20, 0, 20) 
+
+  
+
+	self.hist["gen_nTot_SisCone5"] = ROOT.TH2F("gen_nTot_SisCone5",   "n_tot",  800, -0.5,799.5,400, 0, 200)
+
+	self.hist_gent["gen_nTrans_SisCone5"] = ROOT.TH2F("gen_nTrans_SisCone5",   "n_trans",  80,-0.5,79.5,400, 0, 200)
+
+        self.hist_gent["gen_ptTrans_SisCone5"] = ROOT.TH2F("gen_ptTrans_SisCone5",   "n_trans",  400, 0.,40.,400, 0, 200)
+
+	self.hist_gent["gen_nTransMax_SisCone5"] = ROOT.TH2F("gen_nTransMax_SisCone5",   "n_trans",  80, -0.5,79.5,400, 0, 200)
+
+        self.hist_gent["gen_ptTransMax_SisCone5"] = ROOT.TH2F("gen_ptTransMax_SisCone5",   "n_trans",  400, 0.,40.,400, 0, 200)
+
+
+
+        self.hist_gent["gen_nTransMin_SisCone5"] = ROOT.TH2F("gen_nTransMin_SisCone5",   "n_trans",  80, -0.5,79.5,400, 0, 200)
+
+        self.hist_gent["gen_ptTransMin_SisCone5"] = ROOT.TH2F("gen_ptTransMin_SisCone5",   "n_trans",  400, 0.,40.,200, 0, 100) 
+
+
+
+        self.hist_gent["gen_nTransDiff_SisCone5"] = ROOT.TH2F("gen_nTransDiff_SisCone5",   "n_trans",  160, -80.5,79.5,400, 0, 200)
+
+        self.hist_gent["gen_ptTransDiff_SisCone5"] = ROOT.TH2F("gen_ptTransDiff_SisCone5",   "n_trans",  160, -80.5,79.5,200, 0, 100)
+
+
+
+
+
+        self.hist_genaway["gen_nAway_SisCone5"] = ROOT.TH2F("gen_nAway_SisCone5",   "n_away",  80, -0.5,79.5,200, 0, 100)
+
+        self.hist_genaway["gen_ptAway_SisCone5"] = ROOT.TH2F("gen_ptAway_SisCone5",   "pt_away",  1000, 0.,10.,200, 0, 100)
+
+
+
+        self.hist_gentow["gen_nTow_SisCone5"] = ROOT.TH2F("gen_nTow_SisCone5",   "n_tow",  80, -0.5,79.5,200, 0, 100)
+
+        self.hist_gentow["gen_ptTow_SisCone5"] = ROOT.TH2F("gen_ptTow_SisCone5",   "pt_tow",  80, -0.5,79.5,200, 0, 100)
+
+
+
+
+
+        self.hist_jet["nTot_SisCone5"] = ROOT.TH2F("nTot_SisCone5",   "n_tot",  800, -0.5,799.5,400, 0, 200)
+
+
+
+	self.hist_trans["nTrans_SisCone5"] = ROOT.TH2F("nTrans_SisCone5",   "n_trans",  80, -0.5,79.5,400, 0, 200)
+
+        self.hist_trans["ptTrans_SisCone5"] = ROOT.TH2F("ptTrans_SisCone5",   "pt_trans",  400, 0.,40.,200, 0, 100)
+
+	
+
+	self.hist_trans["nTransMax_SisCone5"] = ROOT.TH2F("nTransMax_SisCone5",   "n_trans",  80, -0.5,79.5,400, 0, 200)
+
+        self.hist_trans["ptTransMax_SisCone5"] = ROOT.TH2F("ptTransMax_SisCone5",   "pt_trans",  400, 0.,40.,200, 0, 100)
+
+	
+
+	self.hist_trans["nTransMin_SisCone5"] = ROOT.TH2F("nTransMin_SisCone5",   "n_trans",  80, -0.5,79.5,400, 0, 200)
+
+        self.hist_trans["ptTransMin_SisCone5"] = ROOT.TH2F("ptTransMin_SisCone5",   "pt_trans",  400, 0.,40.,200, 0, 100)		
+
+
+
+        self.hist_trans["nTransDiff_SisCone5"] = ROOT.TH2F("nTransDiff_SisCone5",   "n_trans",  160, -80.5,79.5,400, 0, 200)
+
+        self.hist_trans["ptTransDiff_SisCone5"] = ROOT.TH2F("ptTransDiff_SisCone5",   "pt_trans",  160, -80.,80.,200, 0, 100)
+
+
+
+        self.hist_away["nAway_SisCone5"] = ROOT.TH2F("nAway_SisCone5",   "n_away",  80, -0.5,79.5,200, 0, 100)
+
+        self.hist_away["ptAway_SisCone5"] = ROOT.TH2F("ptAway_SisCone5",   "pt_away",  1000, 0.,10.,200, 0, 100)
+
+
+
+        self.hist_tow["nTow_SisCone5"] = ROOT.TH2F("nTow_SisCone5",   "n_tow",  80, -0.5,79.5,200, 0, 100)
+
+        self.hist_tow["ptTow_SisCone5"] = ROOT.TH2F("ptTow_SisCone5",   "pt_tow",  1000, 0.,10.,200, 0, 100)
+
+
+
+        for h in self.hist:
+
+            self.hist[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist[h])
+
+	for h in self.hist_vertex:
+
+            self.hist_vertex[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_vertex[h])
+
+	for h in self.hist_gen:
+
+            self.hist_gen[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_gen[h])
+
+	for h in self.hist_gent:
+
+            self.hist_gent[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_gent[h])
+
+	for h in self.hist_trans:
+
+            self.hist_trans[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_trans[h])
+
+	for h in self.hist_pre:
+
+            self.hist_pre[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_pre[h])
+
+	for h in self.hist_post:
+
+            self.hist_post[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_post[h])	
+
+	for h in self.hist_jet:
+
+            self.hist_jet[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_jet[h])
+
+	for h in self.hist_tow:
+
+            self.hist_tow[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_tow[h])
+
+	for h in self.hist_away:
+
+            self.hist_away[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_away[h])
+
+	for h in self.hist_gentow:
+
+            self.hist_gentow[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_gentow[h])
+
+        for h in self.hist_genaway:
+
+            self.hist_genaway[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_genaway[h])
+
+	for h in self.hist_full_genjet:
+
+            self.hist_full_genjet[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_full_genjet[h])	
+
+	for h in self.hist_full_gentracks:
+
+            self.hist_full_gentracks[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_full_gentracks[h])
+
+	for h in self.hist_full_jet:
+
+            self.hist_full_jet[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_full_jet[h])
+
+        for h in self.hist_full_tracks:
+
+            self.hist_full_tracks[h].Sumw2()
+
+            self.GetOutputList().Add(self.hist_full_tracks[h])
+
+
+
+
+
+	 	
+
+
+
+        self.Trans_SisCon5["nTransDensity"] = ROOT.TProfile("nTransDensity_SisCon5",   "n_trans",  200, 0, 100)
+
+        self.Trans_SisCon5["ptTransDensity"] = ROOT.TProfile("ptTransDensity_SisCon5",   "pt_trans",  200, 0, 100)
+
+
+
+	for h in self.Trans_SisCon5:
+
+            self.Trans_SisCon5[h].Sumw2()
+
+            self.GetOutputList().Add(self.Trans_SisCon5[h])	
+
+
+
+        self.other_SisCon5["nTransMax"] = ROOT.TProfile("nTransMax_SisCon5",   "n_trans",  200, 0, 100)
+
+        self.other_SisCon5["nTransMin"] = ROOT.TProfile("nTransMin_SisCon5",   "n_trans",  200, 0, 100)
+
+	self.other_SisCon5["ptTransMax"] = ROOT.TProfile("ptTransMax_SisCon5",   "pt_trans",  200, 0, 100)
+
+        self.other_SisCon5["ptTransMin"] = ROOT.TProfile("ptTransMin_SisCon5",   "pt_trans",  200, 0, 100)
+
+        self.other_SisCon5["nTow"] = ROOT.TProfile("nTow_SisCon5",   "n_tow",  200, 0, 100)
+
+        self.other_SisCon5["nAway"] = ROOT.TProfile("nAway_SisCon5",   "n_away",  200, 0, 100)
+
+        self.other_SisCon5["ptTow"] = ROOT.TProfile("ptTow_SisCon5",   "pt_tow",  200, 0, 100)
+
+        self.other_SisCon5["ptAway"] = ROOT.TProfile("ptAway_SisCon5",   "pt_away",  200, 0, 100)
+
+	self.other_SisCon5["nDiff"] = ROOT.TProfile("nDiff_SisCon5",   "pt_diff",  200, 0, 100)
+
+        self.other_SisCon5["ptDiff"] = ROOT.TProfile("ptDiff_SisCon5",   "pt_diff",  200, 0, 100)	
+
+
+
+        for h in self.other_SisCon5:
+
+            self.other_SisCon5[h].Sumw2()
+
+            self.GetOutputList().Add(self.other_SisCon5[h])
+
+
+
+
+
+
+
+
+
+        """
 	self.hist = {}
         self.hist_vertex = {}
 	self.hist_pre = {}
@@ -146,7 +579,7 @@ class UEAna_tracks(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         for h in self.hist_full_tracks:
             self.hist_full_tracks[h].Sumw2()
             self.GetOutputList().Add(self.hist_full_tracks[h])
-
+        """
          
 
 
@@ -538,8 +971,8 @@ class UEAna_tracks(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         normFactor = self.getNormalizationFactor()
         print "  applying norm", normFactor
 
-	for h in self.Trans_SisCon5:
-           self.Trans_SisCon5[h].Scale(3/(4*2*self.etacut*math.pi))
+	#for h in self.Trans_SisCon5:
+        #   self.Trans_SisCon5[h].Scale(3/(4*2*self.etacut*math.pi))
 	for h in self.other_SisCon5:
            self.other_SisCon5[h].Scale(3/(2*2*self.etacut*math.pi))
 
@@ -580,5 +1013,5 @@ if __name__ == "__main__":
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "plotsUEAna_tracks.root" )
+                               outFile = "plots_7-17-15_eta08.root" )
 

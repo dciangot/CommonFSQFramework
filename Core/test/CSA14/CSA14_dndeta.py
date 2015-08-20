@@ -49,6 +49,17 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
         #Nch_response_Name = histPrefix+"Nch_response"
 
+	nEventsVTX1Name = histPrefix+"nEventsVTX1"
+	nEventsVTXSName = histPrefix+"nEventsVTXS"
+
+	nVtxName = histPrefix+"nVtx"
+	nVtxMBName = histPrefix+"nVtxMB"
+	nVtxVTXName = histPrefix+"nVtxVTX"
+
+	delzVtxName = histPrefix+"delzVtx"
+	delzVtxVTXName = histPrefix+"delzVtxVTX"
+
+
         ptMaxName_GEN_b4 = genPrefix+"ptMax"+binFour
         towardName_GEN_b4 = genPrefix+"toward"+binFour
         awayName_GEN_b4 = genPrefix+"away"+binFour
@@ -461,6 +472,18 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
         for t in self.triggers:
             for v in self.variations:
+
+		self.hist[nEventsVTX1Name]    = ROOT.TH1F(nEventsVTX1Name, nEventsVTX1Name, 10, 0, 10)
+		self.hist[nEventsVTXSName]    = ROOT.TH1F(nEventsVTXSName, nEventsVTXSName, 10, 0, 10)
+
+
+
+		self.hist[nVtxName]    = ROOT.TH1F(nVtxName, nVtxName, 100, 0, 100)
+		self.hist[nVtxMBName]  = ROOT.TH1F(nVtxMBName, nVtxVTXName, 100, 0, 100)
+		self.hist[nVtxVTXName] = ROOT.TH1F(nVtxVTXName, nVtxVTXName, 100, 0, 100)
+
+		self.hist[delzVtxName] = ROOT.TH1F(delzVtxName, delzVtxName, 200, 0, 20)
+		self.hist[delzVtxVTXName] = ROOT.TH1F(delzVtxVTXName, delzVtxVTXName, 200, 0, 20)
 
                 #HISTOGRAMS
                 #self.hist[Nch_reseponse_Name] = ROOT.TH1F(Nch_response_Name, Nch_response_Name, 100, 0, 100)
@@ -941,8 +964,21 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 	binFour = "_b4"
         genPrefix = "GEN_"
 
-        ETAMAX = 2.0
+        ETAMAX = 0.8
 	isData = True
+
+	nEventsVTX1Name = histPrefix+"nEventsVTX1"
+	nEventsVTXSName = histPrefix+"nEventsVTXS"
+
+
+	nVtxName = histPrefix+"nVtx"
+	nVtxMBName = histPrefix+"nVtxMB"
+	nVtxVTXName = histPrefix+"nVtxVTX"
+
+	delzVtxName = histPrefix+"delzVtx"
+	delzVtxVTXName = histPrefix+"delzVtxVTX"
+
+
 
         #HISTOGRAMS
         #Nch_response_Name = histPrefix+"Nch_response"
@@ -1360,7 +1396,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
 
 
-        self.eventCounter += 1
+        #self.eventCounter += 1
 
         self.tracks.newEvent(self.fChain)
 
@@ -1456,7 +1492,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
     
                     #GEN
 
-		    print "New Event"    
+		    #print "New Event"    
                     for i_track, track in enumerate(self.gentracks.get(variation)):
                         #trackp4 = track.genTracks # wrong naming in Samples_CSA14_Tracks_20140904 skim. 
                                                    # this will evolve to trackp4 = track.p4 in next version
@@ -1476,7 +1512,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         #    continue
     		        if track.charge == 0: continue
                         N_all += 1
-			print "N_all is now", N_all
+			#print "N_all is now", N_all
     
                         self.hist[pt_all_Name_GEN].Fill(pt, weight)
                         self.hist[eta_all_Name_GEN].Fill(eta, weight)
@@ -1599,7 +1635,7 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
     
                     #END PARTICLE LOOP
     
-	            print "Filling nch_MB_all with", N_all
+	            #print "Filling nch_MB_all with", N_all
                     self.hist[nch_all_Name_GEN].Fill(N_all, weight)
                     self.hist[nch_eta_Name_GEN].Fill(N_eta, weight)
                     self.hist[nch_etaptH_Name_GEN].Fill(N_etaptH, weight)
@@ -1832,114 +1868,84 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 
                 vertexGood = True
 
+		vertexTwo = True
+		
+		#Not implemented yet
+		ONE_GOOD_VERTEX_MODE = True
+
+		l_vertexNotFake = []
+		l_vertexInTen = []
+		l_vertexNdof = []
+		l_vertexRho = []
+		l_vertexGood = []
+		l_vertexZ = []
+		l_vertexValid = []
+
                 nValid = 0
+		nGood = 0
+		nSingle = 0
                 iValid = -1
-
-
-                #TOMASZ
-                #I've labeled what I want each of these checks to do.  Please let me know if the branch I'm accessing is not what I think.
-
-
-                #TOMASZ HAS SUGGESTED ITERATING OVER ALL VERTICES TO FIND IF THERE IS ONE AND ONLY ONE VALID.
+		#iFirstGoodVertex = -1
 
 
 		#THIS IS HERE TO TEST DIEGO'S NEW LOW PU SKIM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		if self.fChain.lumi < 90: continue
+		if self.fChain.lumi < 90 or self.fChain.trgZeroBias == 0: continue
 
-                for i in range (0, self.fChain.vtxisValid.size() ):
-                    if self.fChain.vtxisValid.at(i) == 1:
-                        nValid += 1
-                        iValid = i
-                #Do we have a single valid vertex?
-                #if self.fChain.vtxisValid.size() != 1: 
-                        #continue
-                        #vertexSingle = False
+                for i in range (0, self.fChain.vtxisFake.size() ):
+                    vtxrho = math.sqrt( self.fChain.vtxx.at(i)**2 + self.fChain.vtxy.at(i)**2 )
+		    l_vertexNotFake.append( not self.fChain.vtxisFake.at(i) )
+		    l_vertexInTen.append( math.fabs( self.fChain.vtxz.at(i) - self.fChain.vtxzBS.at(i) ) <= 10 )
+		    l_vertexNdof.append( self.fChain.vtxndof.at(i) > 4 )
+		    l_vertexRho.append( vtxrho <= 2 )
+		    l_vertexZ.append(self.fChain.vtxz.at(i))
+		    l_vertexValid.append( self.fChain.vtxisValid.at(i) )
+		    l_vertexGood.append(0)
+		    if l_vertexNotFake[i] == 1:
+			nSingle += 1
 
-                #print "Number of vertices", self.fChain.vtxisValid.size()
-                #print "Number of valid", nValid
+		    if i != 0:
+			self.hist[delzVtxName].Fill( math.fabs(l_vertexZ[0] - l_vertexZ[i]) )
 
-                if nValid !=1:
-                    vertexSingle = False
+		    if ( l_vertexNotFake[i] and l_vertexInTen[i] and l_vertexNdof[i] and l_vertexRho[i] and l_vertexValid[i] ): 
+			l_vertexGood[i] = 1
+			nGood += 1
+                        if iValid == -1: iValid = i
+		    if ( l_vertexNotFake[i] and l_vertexInTen[i] and l_vertexRho[i] and l_vertexValid[i] ): 
+                        self.hist[VTX_ndof_Name].Fill( self.fChain.vtxndof.at(i), weight)
 
-                #print "vertexSingle" , vertexSingle
-                #print "iValid", iValid
-                #print "\n"
+			#if iFirstGoodVertex == -1: iFirstGoodVertex = i
 
-                vtxrho = math.sqrt(self.fChain.vtxx.at(iValid)*self.fChain.vtxx.at(iValid) + self.fChain.vtxy.at(iValid)*self.fChain.vtxy.at(iValid))
-
-                if vtxrho > 2:
-                    vertexRho = False
-
-
-                #Temporarily commented out to match Diego's criteria.
-                #Is the hypothetical one-and-only-one vertex valid? (possibly redundant)
-                #if self.fChain.vtxisValid.at(iValid) != 1: 
-                    #continue
-                    #vertexValid = False
-
-                if self.fChain.vtxisFake.at(iValid) == 1: 
-                    #continue
-                    vertexNotFake = False
-
-                #Temporarily commented out to match Diego's criteria.
-                #Do at least three tracks point back to the vertex?
-                #if self.fChain.vtxnTracks.at(iValid) < 3: 
-                    #print "skipping cause vertex tracks is ", self.fChain.vtxnTracks.at(iValid)
-                    #continue
-                    #vertexThreeTracks = False
-
-                #Is the vertex within 10cm of the beamspot?
-                if math.fabs(self.fChain.vtxz.at(iValid)) > 10: 
-                    #print "skipping cause vertex position is ", self.fChain.vtxz.at(iValid)
-                    #continue
-                    vertexInTen = False
-
-                #Is the vertex ndof at least 4?
-                if not self.fChain.vtxndof.at(iValid) > 4: 
-                    #print "skipping cause vertex ndof is ", self.fChain.vtxndof.at(iValid)
-                    #continue
-                    vertexNdof = False
-
-                #Is the vertex chi2 less than 10000?  (This is a check found in the old analysis that was commented with a "why?" but was left in)
-                #if self.fChain.vtxchi2.at(iValid) > 10000: 
-                    #print "skipping cause vertex chi2 is ", self.fChain.vtxchi2.at(iValid)
-                    #continue
-                    #vertexChi2 = False
-
-                #If all conditions are True, we have a good vertex.
-                if not (vertexValid and vertexSingle and vertexThreeTracks and vertexInTen and vertexNdof and vertexChi2 and vertexNotFake and vertexRho):
-                    vertexGood = False 
+                for i in range (0, self.fChain.vtxisFake.size() ):
+		    #if l_vertexGood[i] == 0: continue
+		    if i != 0:
+			self.hist[delzVtxName].Fill( math.fabs(l_vertexZ[0] - l_vertexZ[i]) )
+		    if iValid != -1 and i != iValid:
+			self.hist[delzVtxVTXName].Fill( math.fabs(l_vertexZ[iValid] - l_vertexZ[i]) )
 
 
-                #if we have a single, valid vertex - we can look at its other properties
-                if(vertexSingle and vertexValid and vertexNotFake):
+
+
+		self.hist[nVtxName].Fill(nGood, weight)
+
+		if nGood != 1: vertexGood = False
+
+		#print "vertexGood, nGood", vertexGood, nGood
+		#if vertexGood: self.hist[nVtxVTXName].Fill(nGood, weight)
+		if nGood >= 1: self.hist[nVtxVTXName].Fill(nGood, weight)
+
+		if nSingle != 1: vertexSingle = False
+
+		if iValid != -1:
                     self.hist[VTX_nTrk_Name].Fill(self.fChain.vtxnTracks.at(iValid), weight)
-                    self.hist[VTX_ndof_Name].Fill(self.fChain.vtxndof.at(iValid), weight)
+                    #self.hist[VTX_ndof_Name].Fill(self.fChain.vtxndof.at(iValid), weight)
                     self.hist[VTX_Zpos_Name].Fill(self.fChain.vtxz.at(iValid), weight)
-                    self.hist[VTX_chi2_Name].Fill(self.fChain.vtxchi2.at(iValid), weight)
 
-                #END TOMASZ
 
-                #print "vertex booleans are:", vertexValid, vertexSingle, vertexThreeTracks, vertexInTen, vertexChi2
-                #print "vertex good?:", vertexGood
+		    #THIS IS NOT AN ACCURATE HISTOGRAM RIGHT NOW!  CHANGED TO nGood FOR A SIMPLE CHECK!
+                    self.hist[VTX_chi2_Name].Fill(nGood, weight)
 
-                #This is an acceptable way to check vertices.  Currently disabled because "continue" statements interfere with cut analysis
-                """
-                if self.fChain.vtxisValid.size() != 1: continue
-                if self.fChain.vtxisValid.at(iValid) != 1: continue
-                if self.fChain.vtxnTracks.at(iValid) < 3: 
-                        #print "skipping cause vertex tracks is ", self.fChain.vtxnTracks.at(iValid)
-                        continue
-                if math.fabs(self.fChain.vtxz.at(iValid)) > 10: 
-                        #print "skipping cause vertex position is ", self.fChain.vtxz.at(iValid)
-                        continue
-                if self.fChain.vtxndof.at(iValid) < 4: 
-                        #print "skipping cause vertex ndof is ", self.fChain.vtxndof.at(iValid)
-                        continue
-                if self.fChain.vtxchi2.at(iValid) > 10000: 
-                        #print "skipping cause vertex chi2 is ", self.fChain.vtxchi2.at(iValid)
-                        continue
-                """
+
+
                 good_Nch_TTT = []
                 good_Nch = []
 
@@ -1947,10 +1953,15 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                 list_trk_dz = []
                 list_sigma_xy = []
                 list_sigma_z = []
+
                 #SIM   !!!!!!!!THIS IS THE JUST THE LOOP TO FIND PTMAX!!!!!!!! (and now some cut analysis too)
 
-                #Use GVIM to indent and add a check on: if (vertexValid and vertexSingle and vertexNotFake): do FOR loops (make sure to include both loops!!!!!)
-		if (vertexValid and vertexSingle and vertexNotFake): 
+		#print "nGood =", nGood
+		#Checking if there is a single vertex will greatly speed up the analysis.  Disabled in order to analyze multiple vertices.
+		#if (vertexSingle):
+		if (iValid != -1):       #At least one good vertex 
+		#if (nGood == 1):         #One and only one good vertex
+		    #print "nGood =", nGood, "after iValid check, which is", iValid
                     for i_track, track in enumerate(self.tracks.get(variation)):
                         #if firstTime == False: i_track += 1
                         #firstTime = False
@@ -1968,13 +1979,18 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
     
                         #if self.fChain.recoTrackshighPurity.at(i_track) == False: print "NON HIGH-PURITY TRACK @ INDEX", i_track
     
-                        #This is true if all vertex criteria are good 
+                        #This is true if all vertex criteria are good
+
+			#Bypassing this because it is already checked!
                         VTX = vertexGood
+			VTX = True
+
+
                         #This is true is d0, dz, and ptErr are good for a given track
                         TRK = True
                         #This is true if |n| < 2, pT > 0.5, and there is at least 1 charged particle that passes.
                         KIN = True
-    
+   
     
     
                         eta = trackp4.eta()
@@ -2111,7 +2127,8 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                             phiMax = phi
                             i_ptMax = i_track
                             #print "and we have a new pTmax!"
-    
+
+			    #print "nGood", nGood
     
                         if (vertexValid and vertexSingle and vertexNotFake):
                             N_FFF += 1
@@ -2173,7 +2190,10 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                             #print "Extra info for i_track = 0:"
                             #print trackEta, trackPt5, trackPtErr, trackd0dz, vertexValid, vertexSingle, vertexThreeTracks, vertexInTen, vertexNdof, vertexChi2, vertexGood, VTX, TRK, KIN
     
-    
+		    if N_TTT >= 1: 
+    			if nGood == 1: self.hist[nEventsVTX1Name].Fill(1, weight)
+			if iValid != -1: self.hist[nEventsVTXSName].Fill(1, weight)
+
                     #if not (ptMax !=0 and trackPt5 and trackEta): KIN = False 
     
                     self.hist[CUT_FFF_NchMB_Name].Fill(N_FFF, weight)
@@ -2259,7 +2279,8 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
                         """
     
                         #print "Again, thevertex is", vertexGood
-                        if not vertexGood: continue
+			#Commented since we have a vertex check at the top now
+                        #if not vertexGood: continue
                         #print "so we proceed"
                         eta = trackp4.eta()
                         pt =    trackp4.pt()
@@ -2647,34 +2668,21 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
 	"""
 	
         unfoldStartTime = time.time()
-
         #self.Nch_unfold = RooUnfoldBayes(self.Nch_response, self.hist["HIST_nchMB"], 4);
         self.Nch_RECO = self.Nch_unfold.Hreco();
         self.GetOutputList().Add(self.Nch_RECO);
-
-
         #self.transNch_unfold = RooUnfoldBayes(self.transNch_response, self.hist["2DHIST_transNchName_bh"], 2);
         self.transNch_RECO = self.transNch_unfold.Hreco();
         self.GetOutputList().Add(self.transNch_RECO);
-
-
         unfoldEndTime = time.time()
-
         unfoldTime = unfoldEndTime - unfoldStartTime
-
         print "Unfolding transNch took %d seconds." % unfoldTime
-
         unfoldStartTime = time.time()
-
         self.trans_unfold = RooUnfoldBayes(self.trans_response, self.hist["2DHIST_transName_bh"], 2);
         self.trans_RECO = self.trans_unfold.Hreco();
         self.GetOutputList().Add(self.trans_RECO);
-
-
         unfoldEndTime = time.time()
-
         unfoldTime = unfoldEndTime - unfoldStartTime
-
         print "Unfolding trans took %d seconds." % unfoldTime
 	
 	"""
@@ -2695,7 +2703,6 @@ class CSA14_dndeta(CommonFSQFramework.Core.ExampleProofReader.ExampleProofReader
         self.trans_unfold = RooUnfoldBayes(self.trans_response, self.hist["trans_bh"], 4);
         self.trans_RECO = self.trans_unfold.Hreco();
         self.GetOutputList().Add(self.trans_RECO);
-
         self.transNch_unfold = RooUnfoldBayes(self.transNch_response, self.hist["transNch_bh"], 4);
         self.transNch_RECO = self.transNch_unfold.Hreco();
         self.GetOutputList().Add(self.transNch_RECO);
@@ -2737,8 +2744,8 @@ if __name__ == "__main__":
     sampleList = None
     maxFilesMC = None
     maxFilesData = None
-    #maxFilesMC = 50
-    #maxFilesData = None
+    #maxFilesMC = 1
+    #maxFilesData = 1
     nWorkers = None
     #nWorkers = 15 # Use all cores
 
@@ -2752,7 +2759,7 @@ if __name__ == "__main__":
         maxFilesMC = 1
         maxFilesData = 1
         nWorkers = 1
-	#nWorkers = None
+	nWorkers = None
 
     # another possibility to process bit faster: process only part of MC
     #maxFilesMC = 4
@@ -2778,7 +2785,7 @@ if __name__ == "__main__":
                                maxFilesMC = maxFilesMC,
                                maxFilesData = maxFilesData,
                                nWorkers=nWorkers,
-                               outFile = "DATA_7-23-15_eta20.root" )
+                               outFile = "DATAv2_8-13-15_eta20_vtxs.root" )
 
 
 

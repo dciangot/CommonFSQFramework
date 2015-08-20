@@ -56,6 +56,14 @@
 
 	TCanvas *c1 = new TCanvas("c1","c1",600,400);
 
+	//Remove the statistics block:
+	gStyle->SetOptStat(0);	
+	//gStyle->SetTitleX("p_{T} max (GeV/C)");
+
+// Color codes:
+// 1 black, 2 red, 3 light green, 4 blue, 5 yellow, 6 magenta, 7 cyan, 8 green
+
+
 // Specify option as follows (for comma delimited):
 // "%lg,%lg" chooses "x,y1" from say "x,y1,y2,y3,y4..."
 // Add a %*lg for each column to skip.  So "%lg,%*lg,%*lg,%lg" will read "x,y3" from list above.
@@ -82,10 +90,23 @@ TGraph* Curve_PtSum_TransDIF =    new TGraph(curvesCSVfile, "%lg,%*lg,%*lg,%*lg,
 TGraph* Curve_PtAve_Trans =       new TGraph(curvesCSVfile, "%lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%*lg,%lg");
 
 
+
+
 TProfile *GEN_overallTotalNch_bh;
 gDirectory->GetObject("GEN_overallTotalNch_bh",GEN_overallTotalNch_bh);
 GEN_overallTotalNch_bh->Scale(scaleTotal);
 GEN_overallTotalNch_bh->Draw();
+GEN_overallTotalNch_bh->SetXTitle("p_{T} max (GeV/C)");
+GEN_overallTotalNch_bh->SetYTitle("dN/d#etad#phi");
+
+leg = new TLegend(0.4,0.6,0.89,0.89);
+leg->AddEntry(Curve_Nch_Total,"Monash","l");
+//leg->AddEntry(fun3,"CUETP1M8","l");
+leg->AddEntry(GEN_overallTotalNch_bh,"Data");
+leg->SetHeader("MC/data comparison");
+leg->Draw();
+
+Curve_Nch_Total->SetLineColor(2);
 Curve_Nch_Total->Draw("c same");
 c1->SaveAs("curvePlots/Nch_Total.png");
 
