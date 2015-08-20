@@ -291,13 +291,14 @@ for(Int_t i = 0; i< nevent; i++){
 
 			if(vtxisValid->at(j) && !vtxisFake->at(j) && fabs(vtxz->at(j)-vtxzBS->at(j))<10 && vtxndf->at(j)>4 && vtxrho<2 ){ 
 				nvtx++;
+				if(nvtx==1){  		
 				vtxxx=vtxx->at(j);
 				vtxxy=vtxy->at(j);
 				vtxxz=vtxz->at(j);	
 				vtxxxErr=vtxxErr->at(j);
                                 vtxxyErr=vtxyErr->at(j);
                                 vtxxzErr=vtxzErr->at(j);
-
+				}
 			}
 		}
 
