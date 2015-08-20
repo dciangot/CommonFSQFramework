@@ -1,3 +1,4 @@
+*** Put the correct paths into FW.sh!! ***
 FW.sh : this script start the submission of jobs to lxplus batch queue system, creating a folder for every job, in each folder there is the script for the job submission and the corresponding root macro (in this way, stuck jobs doesn't matter, you can simply resubmit them) . Splitting the dataset is done in file based mode. It's easy to modify for any other necessity.
 
 hadd.sh: once all the jobs are finished this script merge all the histograms in an output file called result.root
