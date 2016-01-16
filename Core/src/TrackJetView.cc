@@ -30,9 +30,9 @@ void TrackJetView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup&
         if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
         addToP4Vec("p4", hIn->at(i).p4());
         addToIVec("nConst", hIn->at(i).numberOfTracks());
-        addToFVec("vx", hIn->at(i).vx());
-        addToFVec("vy", hIn->at(i).vy());
-        addToFVec("vz", hIn->at(i).vz());
+        addToFVec("vx", (float) hIn->at(i).vx());
+        addToFVec("vy", (float) hIn->at(i).vy());
+        addToFVec("vz", (float) hIn->at(i).vz());
 
     }
 }
