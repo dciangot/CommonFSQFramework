@@ -118,8 +118,8 @@ SaveCountHistoInTreeFile::analyze(const edm::Event& iEvent, const edm::EventSetu
     if (runOnce){
         runOnce = false;
         Handle<double> pIn;
-        iEvent.getByLabel("XS",pIn);
-        m_cntHisto->SetBinContent(2, *pIn); // dataset specific, fetch only once
+      //  iEvent.getByLabel("XS",pIn);
+      //  m_cntHisto->SetBinContent(2, *pIn); // dataset specific, fetch only once
         m_cntHisto->SetBinError(2, 0);
     }
 
