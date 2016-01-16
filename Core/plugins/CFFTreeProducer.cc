@@ -38,6 +38,7 @@
 
 #include "CommonFSQFramework/Core/interface/JetView.h"
 #include "CommonFSQFramework/Core/interface/TrackJetView.h"
+#include "CommonFSQFramework/Core/interface/MuonView.h"
 #include "CommonFSQFramework/Core/interface/TriggerResultsView.h"
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
 #include "CommonFSQFramework/Core/interface/HFRecHitView.h"
@@ -67,8 +68,8 @@ class CFFTreeProducer : public edm::EDAnalyzer {
       TTree *m_tree;
       std::vector<EventViewBase *> m_views;
 
-      virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-      virtual void endRun(edm::Run const&, edm::EventSetup const&);
+      //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
+      //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
       //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
       //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
 
@@ -141,6 +142,9 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         else if (miniViewType == "RecoTrackView") {
             m_views.push_back(new RecoTrackView(pset, m_tree));
         }
+        else if (miniViewType == "MuonView") {
+            m_views.push_back(new MuonView(pset, m_tree));
+        }
         else if (miniViewType == "VerticesView") {
             m_views.push_back(new VerticesView(pset, m_tree));
         }
@@ -210,32 +214,20 @@ CFFTreeProducer::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-
+/*
 void 
-CFFTreeProducer::beginRun(const edm::Run& r, edm::EventSetup const& es)
+CFFTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
 {
-
-    using namespace edm;
-    for (unsigned int i = 0; i < m_views.size(); ++i){
-        m_views[i]->doBeginRun(r, es);
-    }
-
 }
-
+*/
 
 // ------------ method called when ending the processing of a run  ------------
-
+/*
 void 
-CFFTreeProducer::endRun(const edm::Run& r, edm::EventSetup const& es)
+CFFTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
 {
-
-    using namespace edm;
-    for (unsigned int i = 0; i < m_views.size(); ++i){
-        m_views[i]->doEndRun(r, es);
-    }
-
 }
-
+*/
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*
