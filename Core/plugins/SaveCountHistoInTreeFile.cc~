@@ -170,10 +170,10 @@ void
 SaveCountHistoInTreeFile::endLuminosityBlock(edm::LuminosityBlock const& lumi, edm::EventSetup const&)
 {
     edm::Handle<edm::MergeableCounter> hCnt;
-    /*lumi.getByLabel("initialCntr", hCnt);
+    lumi.getByLabel("initialCntr", hCnt);
     double val = hCnt->value;
     std::cout << "LumiCnt " <<  val << std::endl;
-    m_evCnt += val;*/
+    m_evCnt += val;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------

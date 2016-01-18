@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
 #'/store/mc/RunIISpring15DR74/MinBias_TuneEE5C_13TeV-herwigpp/AODSIM/NoPURaw_castor_MCRUN2_74_V8-v1/60000/14555D3C-26FA-E411-9DD0-001E67397F71.root'
 #)
 #'/store/mc/RunIISpring15DR74/MinBias_TuneCUETHS1_13TeV-herwigpp/AODSIM/NoPU_castor_MCRUN2_74_V8-v1/00000/00E15C10-85FA-E411-8D14-00259059649C.root'
-'/store/data/Run2015D/L1MinimumBias/AOD/16Dec2015-v1/60000/40CAE123-DBAA-E511-AAB4-0025904C66F2.root'
+'/store/data/Run2015C_25ns/L1MinimumBias/AOD/16Dec2015-v1/00000/0242CA38-49B5-E511-86C6-0025905C2CD0.root'
 ))
 
 # Geometry and Detector Conditions

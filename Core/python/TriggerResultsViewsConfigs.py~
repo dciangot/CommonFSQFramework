@@ -5,7 +5,7 @@ def get(todo):
 
     defs["SingleMuTriggerResultsView"]  = cms.PSet(
         miniView = cms.string("TriggerResultsView"),
-        branchPrefix = cms.untracked.string("trgsnglMu"),
+        branchPrefix = cms.untracked.string("trg"),
         process = cms.string("HLT"),
         triggers = cms.vstring("Iso_Mu20"),
         Iso_Mu20 = cms.vstring("HLT_IsoMu20_*")
@@ -13,7 +13,7 @@ def get(todo):
 
     defs["MinBiasTriggerResultsView"]  = cms.PSet(
             miniView = cms.string("TriggerResultsView"),
-            branchPrefix = cms.untracked.string("trgMinB"),
+            branchPrefix = cms.untracked.string("trg"),
             process = cms.string("HLT"),
             triggers = cms.vstring("HLT_L1MinBiasHF1OR*_*","HLT_L1MinBiasHF1AND*_*")
             )
