@@ -22,7 +22,7 @@ sam["MinBias_Run2015D"]["json"]=''
 sam["MinBias_Run2015D"]["lumiMinBias"]=2.7427317608337905e-05
 sam["MinBias_Run2015D"]["XS"]=36460000000.0
 sam["MinBias_Run2015D"]["pathPAT"]=''
-sam["MinBias_Run2015D"]["DS"]='/MinBias/Run2015D-PromptReco-v4/AOD'
+sam["MinBias_Run2015D"]["DS"]='/L1MinimumBias/Run2015D-16Dec2015-v1/AOD'
 
 
 sam["MinBias_Run2015C"]={}
@@ -37,7 +37,7 @@ sam["MinBias_Run2015C"]["json"]=''
 sam["MinBias_Run2015C"]["lumiMinBias"]=2.7427317608337905e-05
 sam["MinBias_Run2015C"]["XS"]=36460000000.0
 sam["MinBias_Run2015C"]["pathPAT"]=''
-sam["MinBias_Run2015C"]["DS"]='/MinBias/Run2015C-PromptReco-v4/AOD'
+sam["MinBias_Run2015C"]["DS"]='/L1MinimumBias/Run2015C_25ns-16Dec2015-v1/AOD'
 
 
 

@@ -8,37 +8,36 @@ skimEfficiencyMethod="getSkimEff"
 
 sam = {}
 
-/DoubleMuon/Run2015D-PromptReco-v4/AOD
 
 
-sam["DoubleMuon_Run2015D"]={}
-sam["DoubleMuon_Run2015D"]["crabJobs"]=20
-sam["DoubleMuon_Run2015D"]["GT"]='auto_run2::All'
-sam["DoubleMuon_Run2015D"]["name"]='DoubleMuon_Run2015D'
-sam["DoubleMuon_Run2015D"]["isData"]=False
-sam["DoubleMuon_Run2015D"]["numEvents"]=1000000
-sam["DoubleMuon_Run2015D"]["pathSE"]=['']
-sam["DoubleMuon_Run2015D"]["pathTrees"]=''
-sam["DoubleMuon_Run2015D"]["json"]=''
-sam["DoubleMuon_Run2015D"]["lumiMinBias"]=2.7427317608337905e-05
-sam["DoubleMuon_Run2015D"]["XS"]=36460000000.0
-sam["DoubleMuon_Run2015D"]["pathPAT"]=''
-sam["DoubleMuon_Run2015D"]["DS"]='/DoubleMuon/Run2015D-PromptReco-v4/AOD'
+sam["MinBias_Run2015D"]={}
+sam["MinBias_Run2015D"]["crabJobs"]=20
+sam["MinBias_Run2015D"]["GT"]='auto_run2::All'
+sam["MinBias_Run2015D"]["name"]='MinBias_Run2015D'
+sam["MinBias_Run2015D"]["isData"]=False
+sam["MinBias_Run2015D"]["numEvents"]=1000000
+sam["MinBias_Run2015D"]["pathSE"]=['']
+sam["MinBias_Run2015D"]["pathTrees"]=''
+sam["MinBias_Run2015D"]["json"]=''
+sam["MinBias_Run2015D"]["lumiMinBias"]=2.7427317608337905e-05
+sam["MinBias_Run2015D"]["XS"]=36460000000.0
+sam["MinBias_Run2015D"]["pathPAT"]=''
+sam["MinBias_Run2015D"]["DS"]='/MinBias/Run2015D-PromptReco-v4/AOD'
 
 
-sam["DoubleMuon_Run2015C"]={}
-sam["DoubleMuon_Run2015C"]["crabJobs"]=20
-sam["DoubleMuon_Run2015C"]["GT"]='auto_run2::All'
-sam["DoubleMuon_Run2015C"]["name"]='DoubleMuon_Run2015C'
-sam["DoubleMuon_Run2015C"]["isData"]=False
-sam["DoubleMuon_Run2015C"]["numEvents"]=1000000
-sam["DoubleMuon_Run2015C"]["pathSE"]=['']
-sam["DoubleMuon_Run2015C"]["pathTrees"]=''
-sam["DoubleMuon_Run2015C"]["json"]=''
-sam["DoubleMuon_Run2015C"]["lumiMinBias"]=2.7427317608337905e-05
-sam["DoubleMuon_Run2015C"]["XS"]=36460000000.0
-sam["DoubleMuon_Run2015C"]["pathPAT"]=''
-sam["DoubleMuon_Run2015C"]["DS"]='/DoubleMuon/Run2015C-PromptReco-v4/AOD'
+sam["MinBias_Run2015C"]={}
+sam["MinBias_Run2015C"]["crabJobs"]=20
+sam["MinBias_Run2015C"]["GT"]='auto_run2::All'
+sam["MinBias_Run2015C"]["name"]='MinBias_Run2015C'
+sam["MinBias_Run2015C"]["isData"]=False
+sam["MinBias_Run2015C"]["numEvents"]=1000000
+sam["MinBias_Run2015C"]["pathSE"]=['']
+sam["MinBias_Run2015C"]["pathTrees"]=''
+sam["MinBias_Run2015C"]["json"]=''
+sam["MinBias_Run2015C"]["lumiMinBias"]=2.7427317608337905e-05
+sam["MinBias_Run2015C"]["XS"]=36460000000.0
+sam["MinBias_Run2015C"]["pathPAT"]=''
+sam["MinBias_Run2015C"]["DS"]='/MinBias/Run2015C-PromptReco-v4/AOD'
 
 
 
