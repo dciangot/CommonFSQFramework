@@ -1,0 +1,1 @@
+lcg-ls  srm://gridse2.pg.infn.it:8444/srm/managerv2?SFN=/cms/store/user/grampi/$2 | grep .root | awk '{print "fChain.Add(\"root://cream-bdii.pg.infn.it//storage/"$1}' | awk '{print $1"\");"}' > list_$1.txt
