@@ -1,13 +1,17 @@
 #include "CommonFSQFramework/Core/interface/GenericCandidateView.h"
 #include "DataFormats/L1Trigger/interface/L1JetParticle.h"
 
-GenericCandidateView::GenericCandidateView(const edm::ParameterSet& iConfig, TTree * tree):
+GenericCandidateView::GenericCandidateView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
     registerVecFloat("pt", tree);
     registerVecFloat("eta", tree);
     registerVecFloat("phi", tree);
     m_todo = iConfig.getParameter< std::vector<edm::InputTag > >("src");
+
+    // register consumes
+    for (unsigned int i = 0; i < m_todo.size();++i) 
+        iC.consumes<edm::View<reco::Candidate> >(m_todo.at(i));
 }
 
 

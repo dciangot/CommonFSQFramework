@@ -43,7 +43,7 @@ namespace xx {
 
 
 
-JetView::JetView(const edm::ParameterSet& iConfig, TTree * tree):
+JetView::JetView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig, tree),
 pfJetID(PFJetIDSelectionFunctor::FIRSTDATA, PFJetIDSelectionFunctor::LOOSE),
 caloJetID(JetIDSelectionFunctor::PURE09,  JetIDSelectionFunctor::LOOSE),
@@ -127,6 +127,10 @@ m_jecUnc(0)
             //print "JER factors:", etaMax, jer, jerUp, jerDown, "|", err, errUp, errDown
     }
 
+    // register consumes
+    iC.consumes<pat::JetCollection>(m_inputCol);
+    iC.consumes<edm::View<reco::CaloJet> >(m_caloBase);
+    iC.consumes<reco::JetIDValueMap>(m_caloBaseID);
 }
 
 

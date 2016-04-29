@@ -6,13 +6,14 @@ ROOT.gROOT.SetBatch(True)
 
 from ROOT import *
 ROOT.gSystem.Load("libFWCoreFWLite.so")
-AutoLibraryLoader.enable()
+FWLiteEnabler.enable()
 import CommonFSQFramework.Core.Util
 import time
 from multiprocessing import Process, Queue
 
 import pickle
 import distutils.spawn
+import subprocess
 
 def validateRootFile(fname, q):
     rootFile = ROOT.TFile.Open(fname,"r")
@@ -22,9 +23,9 @@ def validateRootFile(fname, q):
     ret["evCntSeenByTreeProducers"]=-1
     
     if type(infoHisto) != ROOT.TH1D:
-        print "\nProblem reading info histo from", fname
+        print ("\nProblem reading info histo from %s " % fname)
     elif infoHisto.GetXaxis().GetBinLabel(3)!="evCnt":
-        if not quiet: print "\nProblem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3)
+        if not quiet: print ("\n Problem - evCnt bin expected at position 3. Got",  infoHisto.getBinLabel(3))
     else:
         ret["evCnt"]  =  int(infoHisto.GetBinContent(3))
     if  infoHisto.GetXaxis().GetBinLabel(4)=="evCntSeenByTreeProducers":
@@ -36,7 +37,7 @@ def validateRootFile(fname, q):
     return q.put(ret)
 
 def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
-    if not quiet: print "Validating",
+    if not quiet: print ("Validating",)
     # verify we are able to read event counts from very file
     fileCnt = 0
     threads = {}
@@ -82,7 +83,7 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
             else:
                 break
 
-    if not quiet: print "" # EOL
+    if not quiet: print ("") # EOL
     fileCnt = 0
     for t in threads:
         if threads[t][2]==None:
@@ -91,10 +92,10 @@ def validateRootFiles(fileListUnvalidated, maxFiles=None, quiet = False):
         result = threads[t][2]["evCnt"] 
         resEvCntSeenByTreeProducers = threads[t][2]["evCntSeenByTreeProducers"]
         if result < 0:
-            print "Problematic file", t
+            print ("Problematic file", t)
             continue
         elif result == 0:
-            print "Warning: 0 ev file", t
+            print ("Warning: 0 ev file", t)
 
         fileList.append(t)
         if result > 0:
@@ -117,7 +118,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
     # in principle we should check if lcg-ls supports -c/ -o argumets
     legacyMode = "slc5" in os.environ["SCRAM_ARCH"] 
     if legacyMode:
-        print "Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible"
+        print ("Warning - running in legacy mode. Access to remote directories with more than 1000 files wont be possible")
 
 
     if usePickle and donotvalidate:
@@ -125,8 +126,8 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
 
     # TODO: SmallXAnaDefFile access function in Util
     if "SmallXAnaDefFile" not in os.environ:
-        print "Please set SmallXAnaDefFile environment variable:"
-        print "export SmallXAnaDefFile=FullPathToFile"
+        print ("Please set SmallXAnaDefFile environment variable:")
+        print ("export SmallXAnaDefFile=FullPathToFile")
         raise Exception("Whooops! SmallXAnaDefFile env var not defined")
 
     anaDefFile = os.environ["SmallXAnaDefFile"]
@@ -164,7 +165,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
 
     anaVersion=CommonFSQFramework.Core.Util.getAnaDefinition("anaVersion")
 
-    if not quiet: print "printing info for: ",  anaVersion
+    if not quiet: print ("printing info for: ",  anaVersion)
 
     ret = {}
     tab = "     "
@@ -177,22 +178,22 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
         pickleName = samplesFileDir+"cache_"+anaVersion+"_"+s+".pkl"
         fromPickle = False
         writePickle = True
-        if not quiet: print "#"*120
-        if not quiet: print "Found sample:", s
-        if not quiet: print tab,"dataset:",sampleList[s]["DS"]
-        if not quiet: print tab, "xsection:",sampleList[s]["XS"] # note you can also fetch this from tree files (bin 2 in info histo)
+        if not quiet: print ("#"*120)
+        if not quiet: print ("Found sample:", s)
+        if not quiet: print (tab,"dataset:",sampleList[s]["DS"])
+        if not quiet: print (tab, "xsection:",sampleList[s]["XS"]) # note you can also fetch this from tree files (bin 2 in info histo)
         evCnt = 0
         evCntSeenByTreeProducers = 0
         fileList = []
         if "pathTrees" not in sampleList[s]:
             # TODO: should this be in localAccess part?
-            if not quiet: print tab, "path to trees not found! Blame the skim-responsible-guy."
+            if not quiet: print (tab, "path to trees not found! Blame the skim-responsible-guy.")
             writePickle = False
         else:
             fileListUnvalidated = set()
             if localAccess:
-                if not quiet: print tab, "path to trees:",sampleList[s]["pathTrees"]
-                if not quiet: print tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable"
+                if not quiet: print (tab, "path to trees:",sampleList[s]["pathTrees"])
+                if not quiet: print (tab, "path to trees taken from 'sampleList[s][\"pathTrees\"]' variable")
                 pathTrees2 = sampleList[s]["pathTrees"]
                 for pathTrees in pathTrees2:
                   for dirpath, dirnames, filenames in os.walk(pathTrees):
@@ -203,7 +204,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         fname = dirpath.replace("//","/") + f   # somehow root doesnt like // at the begining
                         fileListUnvalidated.add(localROOTPrefix+fname)
             elif isXrootdAccess:
-              if not quiet: print tab, "will access trees from:",sampleList[s]["pathSE"]
+              if not quiet: print (tab, "will access trees from:",sampleList[s]["pathSE"])
                 # Warning: duplicated from copyAnaData. Fixme
               import subprocess
               pathSE2 = sampleList[s]["pathSE"]
@@ -224,7 +225,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                         if "trees_" not in fname: continue
                         srcFile = pathSE + "/" + fname
                         if "/store/" not in srcFile:
-                            raise "Cannot convert to lfn:", srcFile
+                            raise ("Cannot convert to lfn:", srcFile)
                         lfn = "/store/"+srcFile.split("/store/")[-1]
 
                         #targetFile = targetDir + "/" + fname
@@ -241,7 +242,7 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             else:
                 raise Exception("Thats confusing! File access method undetermined!")
 
-            print "Total number of files in sample:", len(fileListUnvalidated)
+            print ("Total number of files in sample:", len(fileListUnvalidated))
             if donotvalidate:
                 fileList = list(fileListUnvalidated) 
                 evCnt = 0
@@ -252,10 +253,10 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
                     pkl_file = open(pickleName, 'rb')
                     pickledData = pickle.load(pkl_file)
                     if set(pickledData["files"])!=set(fileListUnvalidated):
-                        print "File list from pickled file and unvalidated list of files different"
-                        print "Broken (?) pickle file", pickleName
+                        print ("File list from pickled file and unvalidated list of files different")
+                        print ("Broken (?) pickle file", pickleName)
                     else:
-                        print "Cached data from", pickleName
+                        print ("Cached data from", pickleName)
                         fileListUnvalidated = set()  # Q&D - disable validation. 
                         fileList = pickledData["files"]
                         evCnt =  pickledData["evCnt"]
@@ -281,16 +282,16 @@ def getTreeFilesAndNormalizations(maxFilesMC = None, maxFilesData = None, quiet 
             outputPickle.close()
 
 
-        if not quiet: print tab, "number of tree files:", len(fileList)
-        if not quiet: print tab, "events processed in skim:", evCnt # in agreement with crab xml output
-        if not quiet: print tab, "list of files for this ds saved in 'fileList' variable "
+        if not quiet: print (tab, "number of tree files:", len(fileList))
+        if not quiet: print (tab, "events processed in skim:", evCnt) # in agreement with crab xml output
+        if not quiet: print (tab, "list of files for this ds saved in 'fileList' variable ")
         if evCnt == 0:
             normFactor = -1
-            if not quiet: print "Event count equals zero. Cowardly refusing to calculate normalization factor"
+            if not quiet: print ("Event count equals zero. Cowardly refusing to calculate normalization factor")
         else:
             normFactor = sampleList[s]["XS"]/evCnt
-            if not quiet: print tab, "Normalization factor is ", normFactor
-            if not quiet: print tab, "[xcheck] number of events passed to tree producers (ie when running on AOD):", evCntSeenByTreeProducers
+            if not quiet: print (tab, "Normalization factor is ", normFactor)
+            if not quiet: print (tab, "[xcheck] number of events passed to tree producers (ie when running on AOD):", evCntSeenByTreeProducers)
         ret[s]["files"] = fileList
         ret[s]["normFactor"] = normFactor
 

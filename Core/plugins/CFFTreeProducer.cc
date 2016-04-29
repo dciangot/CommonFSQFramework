@@ -67,8 +67,8 @@ class CFFTreeProducer : public edm::EDAnalyzer {
       TTree *m_tree;
       std::vector<EventViewBase *> m_views;
 
-      //virtual void beginRun(edm::Run const&, edm::EventSetup const&) override;
-      //virtual void endRun(edm::Run const&, edm::EventSetup const&) override;
+      virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+      virtual void endRun(edm::Run const&, edm::EventSetup const&);
       //virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
       //virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) override;
 
@@ -121,55 +121,55 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
         prefixes.insert(prefix);
 
         if (miniViewType == "TrackJetView") {
-            m_views.push_back(new TrackJetView(pset, m_tree));
+            m_views.push_back(new TrackJetView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "JetView") {
-            m_views.push_back(new JetView(pset, m_tree));
+            m_views.push_back(new JetView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "TriggerResultsView") {
-            m_views.push_back(new TriggerResultsView(pset, m_tree));
+            m_views.push_back(new TriggerResultsView(pset, m_tree, this->consumesCollector(), this));
         }
         else if (miniViewType == "GenericCandidateView") {
-            m_views.push_back(new GenericCandidateView(pset, m_tree));
+            m_views.push_back(new GenericCandidateView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "GenPartView") {
-            m_views.push_back(new GenPartView(pset, m_tree));
+            m_views.push_back(new GenPartView(pset, m_tree, this->consumesCollector()));
         }
-	else if (miniViewType == "GenJetView") {
-	    m_views.push_back(new GenJetView(pset, m_tree));
-	}
+        else if (miniViewType == "GenJetView") {
+            m_views.push_back(new GenJetView(pset, m_tree, this->consumesCollector()));
+        }
         else if (miniViewType == "RecoTrackView") {
-            m_views.push_back(new RecoTrackView(pset, m_tree));
+            m_views.push_back(new RecoTrackView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "VerticesView") {
-            m_views.push_back(new VerticesView(pset, m_tree));
+            m_views.push_back(new VerticesView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorRecHitView") {
-            m_views.push_back(new CastorRecHitView(pset, m_tree));
+            m_views.push_back(new CastorRecHitView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorTowerView") {
-            m_views.push_back(new CastorTowerView(pset, m_tree));
+            m_views.push_back(new CastorTowerView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "CastorJetView") {
-            m_views.push_back(new CastorJetView(pset, m_tree));
+            m_views.push_back(new CastorJetView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "HFRecHitView") {
-	    m_views.push_back(new HFRecHitView(pset, m_tree));
+	    m_views.push_back(new HFRecHitView(pset, m_tree, this->consumesCollector()));
 	}
 	else if (miniViewType == "HBHERecHitView") {
-            m_views.push_back(new HBHERecHitView(pset, m_tree));
+            m_views.push_back(new HBHERecHitView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "EcalRecHitView") {
-            m_views.push_back(new EcalRecHitView(pset, m_tree));
+            m_views.push_back(new EcalRecHitView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "CaloTowerView") {
-            m_views.push_back(new CaloTowerView(pset, m_tree));
+            m_views.push_back(new CaloTowerView(pset, m_tree, this->consumesCollector()));
         }
 	else if (miniViewType == "PFCandidateView") {
-            m_views.push_back(new PFCandidateView(pset, m_tree));
+            m_views.push_back(new PFCandidateView(pset, m_tree, this->consumesCollector()));
         }
         else if (miniViewType == "PFClusterView") {
-            m_views.push_back(new PFClusterView(pset, m_tree));
+            m_views.push_back(new PFClusterView(pset, m_tree, this->consumesCollector()));
         }
         else {
             throw "Miniview not known: "+ miniViewType;
@@ -178,7 +178,7 @@ CFFTreeProducer::CFFTreeProducer(const edm::ParameterSet& iConfig)
     }
 
     // run/event number
-    m_views.push_back(new EventIdData(edm::ParameterSet(), m_tree));
+    m_views.push_back(new EventIdData(edm::ParameterSet(), m_tree, this->consumesCollector()));
 
 
 }
@@ -210,20 +210,32 @@ CFFTreeProducer::endJob()
 }
 
 // ------------ method called when starting to processes a run  ------------
-/*
+
 void 
-CFFTreeProducer::beginRun(edm::Run const&, edm::EventSetup const&)
+CFFTreeProducer::beginRun(const edm::Run& r, edm::EventSetup const& es)
 {
+
+    using namespace edm;
+    for (unsigned int i = 0; i < m_views.size(); ++i){
+        m_views[i]->doBeginRun(r, es);
+    }
+
 }
-*/
+
 
 // ------------ method called when ending the processing of a run  ------------
-/*
+
 void 
-CFFTreeProducer::endRun(edm::Run const&, edm::EventSetup const&)
+CFFTreeProducer::endRun(const edm::Run& r, edm::EventSetup const& es)
 {
+
+    using namespace edm;
+    for (unsigned int i = 0; i < m_views.size(); ++i){
+        m_views[i]->doEndRun(r, es);
+    }
+
 }
-*/
+
 
 // ------------ method called when starting to processes a luminosity block  ------------
 /*

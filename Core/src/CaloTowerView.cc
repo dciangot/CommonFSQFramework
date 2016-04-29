@@ -2,13 +2,17 @@
 
 
 
-CaloTowerView::CaloTowerView(const edm::ParameterSet& iConfig, TTree * tree):
+CaloTowerView::CaloTowerView(const edm::ParameterSet& iConfig, TTree * tree, edm::ConsumesCollector && iC):
 EventViewBase(iConfig,  tree)
 {
+    // get config
     registerVecP4("p4", tree);
     
     registerVecFloat("emEnergy", tree);
     registerVecFloat("hadEnergy", tree);
+    
+    registerVecInt("ieta", tree);
+    registerVecInt("iphi", tree);
 
     registerVecInt("hasEB", tree);
     registerVecInt("hasEE", tree);
@@ -16,8 +20,10 @@ EventViewBase(iConfig,  tree)
     registerVecInt("hasHE", tree);
     registerVecInt("hasHF", tree);
 
-
     m_inputCol = iConfig.getParameter<edm::InputTag>("inputcoll");
+
+    // register data access
+    iC.consumes< CaloTowerCollection >(m_inputCol);
     
 
 }
@@ -33,6 +39,9 @@ void CaloTowerView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup
         addToP4Vec("p4", reco::Candidate::LorentzVector(iCT->px(),iCT->py(),iCT->pz(),iCT->energy()));
         addToFVec("emEnergy", iCT->emEnergy());
         addToFVec("hadEnergy", iCT->hadEnergy());
+	
+	addToIVec("ieta", iCT->ieta());
+	addToIVec("iphi", iCT->iphi());
 
 	int hasEB = 0;
 	int hasEE = 0;
