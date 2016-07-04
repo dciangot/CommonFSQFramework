@@ -26,9 +26,10 @@ EventViewBase(iConfig,  tree)
  m_inputCol = iConfig.getParameter<edm::InputTag>("muons");
  // register consumes
 
- iC.consumes< std::vector<reco::BeamSpot> >(edm::InputTag("offlineBeamSpot"));
+ iC.consumes<reco::BeamSpot> (edm::InputTag("offlineBeamSpot"));
  iC.consumes< std::vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVerticesWithBS"));
  iC.consumes< std::vector<reco::Muon> >(m_inputCol);  
+ iC.consumes< std::vector<reco::Track> >(edm::InputTag("generalTracks"));  
     
 }
 
@@ -40,6 +41,9 @@ void MuonView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSe
  edm::Handle<reco::BeamSpot> beamSpotHandle;
  iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
 
+ edm::Handle<std::vector<reco::Track> > hTr;
+ iEvent.getByLabel(edm::InputTag("generalTracks"), hTr); 	
+ 
  reco::Vertex primaryVertex;
  reco::Vertex primVertex_tmp;
  bool goodvertex = false;
@@ -70,39 +74,44 @@ void MuonView::fillSpecific(const edm::Event& iEvent, const edm::EventSetup& iSe
  bool isLoose = false;
  bool isMedium = false;
 
- for (unsigned int i = 0; i< hIn->size();++i){
-  if (hIn->at(i).pt() < m_minPt ) continue;
-  if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
-  dz = hIn->at(i).globalTrack()->dz(primaryVertex.position());
-  if (std::abs(dz) > m_maxDZ) continue;
-  dxy = hIn->at(i).globalTrack()->dxy(primaryVertex.position() );
+  
+ std::cout <<"size: " <<hIn->size() << std::endl;
+ for (unsigned int i = 0; i< hIn->size();i++){
+  if (hIn->at(i).isGlobalMuon()){
+	  reco::Track* track = (reco::Track*)hIn->at(i).track().get(); 
+ 	  std::cout <<"track d0: " << track->d0() << std::endl;
+	  if (hIn->at(i).pt() < m_minPt ) continue;
+	  if (std::abs(hIn->at(i).eta()) > m_maxEta ) continue;
+	  dz = 0;//hIn->at(i).track()->dz(primaryVertex.position());
+	  if (std::abs(dz) > m_maxDZ) continue;
+	  dxy = 0;//hIn->at(i).track()->dxy(primaryVertex.position() );
 
-  px = hIn->at(i).px();
-  py = hIn->at(i).py();
-  pz = hIn->at(i).pz();
-  E = px*px + py*py + pz*pz;
-  isTight =  muon::isTightMuon(hIn->at(i), primaryVertex);
-  isLoose =  muon::isLooseMuon( hIn->at(i));
-  isMedium =  muon::isMediumMuon( hIn->at(i));
-  if (isLoose == false) continue;
-  if (isMedium == false) continue;
-  // Note: all fills (below) should be done consistently after all cuts are applied
-  iso = (hIn->at(i).pfIsolationR04().sumChargedHadronPt + std::max(0., hIn->at(i).pfIsolationR04().sumNeutralHadronEt + hIn->at(i).pfIsolationR04().sumPhotonEt - 0.5*hIn->at(i).pfIsolationR04().sumPUPt))/hIn->at(i).pt();
-  if(isLoose == true || isMedium == true || isTight == true){  
-   addToP4Vec("p4", reco::Candidate::LorentzVector(px,py,pz,E));
-   addToFVec("dxy", dxy);
-   addToFVec("dz", dz);
-   addToFVec("dzErr", hIn->at(i).globalTrack()->dzError());
-   addToFVec("d0", hIn->at(i).globalTrack()->d0());
-   addToFVec("d0Err", hIn->at(i).globalTrack()->d0Error());
-   addToFVec("vx", hIn->at(i).globalTrack()->vx());
-   addToFVec("vy", hIn->at(i).globalTrack()->vy());
-   addToFVec("vz", hIn->at(i).globalTrack()->vz());
-   addToFVec("tight", isTight );
-   addToFVec("loose", isLoose);
-   addToFVec("charge",hIn->at(i).charge());
-   addToFVec("isolation", iso);
-     
-  }
+	  px = hIn->at(i).px();
+	  py = hIn->at(i).py();
+	  pz = hIn->at(i).pz();
+	  E = px*px + py*py + pz*pz;
+	  isTight =  muon::isTightMuon(hIn->at(i), primaryVertex);
+	  isLoose =  muon::isLooseMuon( hIn->at(i));
+	  isMedium =  muon::isMediumMuon( hIn->at(i));
+	  if (isLoose == false) continue;
+	  if (isMedium == false) continue;
+	  // Note: all fills (below) should be done consistently after all cuts are applied
+	  iso = (hIn->at(i).pfIsolationR04().sumChargedHadronPt + std::max(0., hIn->at(i).pfIsolationR04().sumNeutralHadronEt + hIn->at(i).pfIsolationR04().sumPhotonEt - 0.5*hIn->at(i).pfIsolationR04().sumPUPt))/hIn->at(i).pt();
+	  if(isLoose == true || isMedium == true || isTight == true){  
+	   addToP4Vec("p4", reco::Candidate::LorentzVector(px,py,pz,E));
+	   addToFVec("dxy", dxy);
+	   addToFVec("dz", dz);
+	   /*addToFVec("dzErr", hIn->at(i).globalTrack()->dzError());
+	   addToFVec("d0", hIn->at(i).globalTrack()->d0());
+	   addToFVec("d0Err", hIn->at(i).globalTrack()->d0Error());
+	   addToFVec("vx", hIn->at(i).globalTrack()->vx());
+	   addToFVec("vy", hIn->at(i).globalTrack()->vy());
+	   addToFVec("vz", hIn->at(i).globalTrack()->vz());
+	   */
+	   addToFVec("tight", isTight );
+	   addToFVec("loose", isLoose);
+	   addToFVec("charge",hIn->at(i).charge());
+ 	   addToFVec("isolation", iso);
+ } }
  }
 }
